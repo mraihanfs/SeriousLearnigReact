@@ -1,12 +1,10 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import Login from './routes/Login.jsx'
-import Dashboard from './routes/Dashboard.jsx';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Login from "./routes/Login.jsx";
+import Home from "./routes/Home.jsx";
+import Dashboard from "./routes/Dashboard.jsx";
 
 const router = createBrowserRouter([
   {
@@ -15,13 +13,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/home",
-    element: <Dashboard />,
+    element: <Home />,
   },
-
 ]);
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>
-)
+);

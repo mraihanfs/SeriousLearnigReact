@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import backgroundLogin from "../assets/backgroundLogin.jpg";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom'
 
 const backgroundStyle = {
   backgroundImage: `url(${backgroundLogin})`,
@@ -12,6 +13,10 @@ const backgroundStyle = {
 const Login = () => {
   const [isHidePass, setIsHidePass] = useState(true);
 
+  const navigate = useNavigate();
+
+  const goToDashboard = () => navigate('/home')
+
   return (
     <div
       style={backgroundStyle}
@@ -20,7 +25,7 @@ const Login = () => {
       <div className="flex justify-center items-center">
         <div className="bg-white container rounded-xl">
           <div className="m-3 text-justify text-xl">Sign in</div>
-          <form action="" className="grid grid-rows-auto">
+          <form action="" className="grid grid-rows-auto" onSubmit={goToDashboard}>
             <div className="m-3">
               <label htmlFor="username" className="block m-1 text-slate-600">
                 Email or phone number
@@ -54,7 +59,7 @@ const Login = () => {
                     type="checkbox"
                     className="form-checkbox border border-solid p-1 text-black"
                     id="remeber"
-                  />git
+                  />
                   <label htmlFor="remeber" className="m-1">
                     Remember Me
                   </label>

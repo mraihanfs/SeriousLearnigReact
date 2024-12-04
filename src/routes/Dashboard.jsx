@@ -1,36 +1,12 @@
-import React, { useState } from "react";
-import { TfiAlignJustify } from "react-icons/tfi";
-import { MdHome } from "react-icons/md";
-import { MdOutlineStore } from "react-icons/md";
-import { MdOutlinePerson } from "react-icons/md";
-import { MdOutlineInsertChart } from "react-icons/md";
-
-import AccountProfile from "../components/AccountProfile";
-import Navbar from "../components/Navbar";
+import React from "react";
+import CardDashboard from "../components/CardDashboard";
 
 const Dashboard = () => {
-  const [isNavShow, setIsNavShow] = useState(true);
-
   return (
-    <div className="flex flex-col h-screen w-screen">
-      <header className="flex p-3 bg-slate-600 border rounded-xl text-white justify-between">
-        <div className="flex items-center">
-          <TfiAlignJustify
-            className="me-3 text-lg inline hover:cursor-pointer"
-            onClick={() => setIsNavShow(!isNavShow)}
-          />
-          <h1 className="text-sans text-2xl text-opacity-100 font-bold">
-            Kiosk Apps
-          </h1>
-        </div>
-        <div className="relative flex flex-col">
-          <AccountProfile />
-        </div>
-      </header>
-      <div className="flex flex-1 overflow-hidden">
-        <Navbar navShow={isNavShow} />
-        <iframe src="" frameborder="0" className="flex-1 w-full h-full"></iframe>
-      </div>
+    <div className="flex justify-between w-full">
+      <CardDashboard description={"Jumlah Product"} value={"100"} />
+      <CardDashboard description={"Jumlah Customer"} value={"10"} />
+      <CardDashboard description={"Jumlah Bill"} value={"Rp. 500.000.000"} />
     </div>
   );
 };
