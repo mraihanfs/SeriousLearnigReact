@@ -1,0 +1,1 @@
+export const FIELDS_NAME_PRODUCT = ["No.", "Nama Product", "Unit", "Harga"];
