@@ -3,6 +3,8 @@ import { MdHome } from "react-icons/md";
 import { MdOutlineStore } from "react-icons/md";
 import { MdOutlinePerson } from "react-icons/md";
 import { MdOutlineInsertChart } from "react-icons/md";
+import { MdSearch } from "react-icons/md";
+
 
 const Navbar = ({ navShow, onRenderData }) => {
   const sendData = (data) => {
@@ -11,9 +13,9 @@ const Navbar = ({ navShow, onRenderData }) => {
 
   return (
     <nav
-      className={`flex flex-col items-start h-screen border rounded-xl bg-slate-600 text-white pt-3 ps-3 ${
-        navShow ? "w-36" : "w-16"
-      }`}
+      className={`flex flex-col items-start h-full border rounded-xl bg-slate-600 text-white pt-3 ps-3 m-1 ${
+        navShow ? "w-48" : "w-16"
+      } sticky top-0 left-0 overflow-y-auto`} 
     >
       <ul>
         <li
@@ -29,7 +31,7 @@ const Navbar = ({ navShow, onRenderData }) => {
           key="product"
           onClick={() => sendData("product")}
         >
-          <MdOutlineStore className="text-3xl me-3" />
+          <MdOutlineStore className="text-3xl mx-1" />
           <h2 className={navShow ? "" : "hidden"}>Product</h2>
         </li>
         <li
@@ -37,7 +39,7 @@ const Navbar = ({ navShow, onRenderData }) => {
           key="customer"
           onClick={() => sendData("customer")}
         >
-          <MdOutlinePerson className="text-3xl me-3" />
+          <MdOutlinePerson className="text-3xl mx-1" />
           <h2 className={navShow ? "" : "hidden"}>Customer</h2>
         </li>
         <li
@@ -45,9 +47,17 @@ const Navbar = ({ navShow, onRenderData }) => {
           key="report"
           onClick={() => sendData("report")}
         >
-          <MdOutlineInsertChart className="text-3xl me-3" />
-          <h2 className={navShow ? "" : "hidden"}>Report</h2>
+          <MdOutlineInsertChart className="text-3xl mx-1" />
+          <h2 className={navShow ? "" : "hidden"}>Transaction</h2>
         </li>
+        {/* <li
+          className="flex mt-3 hover:cursor-pointer items-center"
+          key="report"
+          onClick={() => sendData("report")}
+        >
+          <MdSearch className="text-3xl mx-1" />
+          <h2 className={navShow ? "" : "hidden"}>Compare Market</h2>
+        </li> */}
       </ul>
     </nav>
   );

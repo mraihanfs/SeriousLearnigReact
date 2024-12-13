@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { MdAccountCircle } from "react-icons/md";
-import Divider from "./Divider";
-
+import Divider from "./DividerHorizontal";
 
 const AccountProfile = () => {
   const [isDropdownShow, setIsDropdownShow] = useState(false);
@@ -13,7 +12,7 @@ const AccountProfile = () => {
         onClick={() => setIsDropdownShow(!isDropdownShow)}
       />
       <div
-        className={`absolute mt-12 right-0 bg-slate-600 text-white rounded ${
+        className={`absolute mt-12 right-0 bg-slate-600 text-white rounded border border-black shadow-lg ${
           isDropdownShow ? "" : "hidden"
         }`}
       >
