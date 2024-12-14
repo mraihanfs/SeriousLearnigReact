@@ -49,7 +49,7 @@ const Login = () => {
               <div className="mt-5 justify-self-center">
                 <input
                   type="submit"
-                  className="border border-solid p-1 rounded-full bg-slate-600 text-white w-80 h-12"
+                  className="border border-solid p-1 rounded-full bg-slate-600 text-white w-80 h-12 hover:cursor-pointer hover:bg-slate-300 hover:text-black"
                   value="Sign in"
                 />
               </div>
