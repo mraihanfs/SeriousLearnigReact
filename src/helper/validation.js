@@ -1,0 +1,1 @@
+export const isEveryValueEmpty = (obj) => Object.values(obj).every(value => value == "");

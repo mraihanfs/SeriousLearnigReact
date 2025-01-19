@@ -10,4 +10,7 @@ export const SEMBAKO_UNITS = [
   "pack",
   "box",
   "cylinder",
+  "bag",
+  "pack",
+  "jar",
 ];

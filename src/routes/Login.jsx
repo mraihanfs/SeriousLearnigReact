@@ -78,7 +78,7 @@ const Login = () => {
               Don't have an account?
               <a
                 href="http://"
-                className="text-black hover:text-slate-600 text-sans underline underline-offset-4 ms-1"
+                className="text-black hover:text-slate-600 text-sans underline underline-offset-[5px] ms-1"
               >
                 Sign Up
               </a>

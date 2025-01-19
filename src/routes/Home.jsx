@@ -1,9 +1,6 @@
 import React, { useState, Suspense } from "react";
 import { TfiAlignJustify } from "react-icons/tfi";
-import { MdHome } from "react-icons/md";
-import { MdOutlineStore } from "react-icons/md";
-import { MdOutlinePerson } from "react-icons/md";
-import { MdOutlineInsertChart } from "react-icons/md";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import AccountProfile from "../components/AccountProfile";
 import Navbar from "../components/Navbar";
@@ -55,10 +52,13 @@ const Home = () => {
         </div>
       </header>
       <div className="flex flex-1">
-        <Navbar navShow={isNavShow} onRenderData={changeRenderContent}/>
+        <Navbar navShow={isNavShow} onRenderData={changeRenderContent} />
         <Suspense
-          className=""
-          fallback={<div>Loading...</div>}
+          fallback={
+            <div className="h-screen w-screen flex flex-col items-center justify-center">
+              <CircularProgress />
+            </div>
+          }
         >
           <div className=" flex-1 w-full h-full m-1">{renderContent()}</div>
         </Suspense>
