@@ -6,7 +6,7 @@ import AccountProfile from "../components/AccountProfile";
 import Navbar from "../components/Navbar";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
-// const Customer = React.lazy(() => import("./Customer"));
+const Customer = React.lazy(() => import("./Customer"));
 const Product = React.lazy(() => import("./Product"));
 // const Compare = React.lazy(() => import("./Compare"));
 // const Transaction = React.lazy(() => import("./Transaction"));
@@ -24,8 +24,8 @@ const Home = () => {
     switch (currentPage) {
       case "dashboard":
         return <Dashboard />;
-      // case "customer":
-      //   return <Customer />;
+      case "customer":
+        return <Customer />;
       case "product":
         return <Product />;
       // case "transaction":

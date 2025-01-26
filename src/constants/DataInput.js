@@ -14,3 +14,11 @@ export const SEMBAKO_UNITS = [
   "pack",
   "jar",
 ];
+
+export const CUSTOMER_TYPES = [
+  "Restoran",
+  "Kafe",
+  "Hotel",
+  "Warung Makan",
+  "Penginapan"
+];

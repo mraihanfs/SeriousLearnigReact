@@ -600,3 +600,166 @@ export const PRODUCTS = [
   //   harga: 4567.0,
   // },
 ];
+
+export const CUSTOMERS = [
+  {
+    customerId: 1,
+    name: "Budi Santoso",
+    email: "budi.santoso@babakanmadang.com",
+    phone: "+62-812-3456-7890",
+    address: "Restoran Sederhana, Babakan Madang, Bogor",
+    customerType: "Restoran"
+  },
+  {
+    customerId: 2,
+    name: "Siti Nurhaliza",
+    email: "siti.nurhaliza@babakanmadang.com",
+    phone: "+62-813-9876-5432",
+    address: "Kafe Kopi Nusantara, Babakan Madang, Bogor",
+    customerType: "Kafe"
+  },
+  {
+    customerId: 3,
+    name: "Ahmad Faisal",
+    email: "ahmad.faisal@babakanmadang.com",
+    phone: "+62-811-2233-4455",
+    address: "Hotel Harmoni, Babakan Madang, Bogor",
+    customerType: "Hotel"
+  },
+  {
+    customerId: 4,
+    name: "Lilis Suryani",
+    email: "lilis.suryani@babakanmadang.com",
+    phone: "+62-815-6677-8899",
+    address: "Warung Makan Lestari, Babakan Madang, Bogor",
+    customerType: "Warung Makan"
+  },
+  {
+    customerId: 5,
+    name: "Heri Supriyadi",
+    email: "heri.supriyadi@babakanmadang.com",
+    phone: "+62-819-3344-5566",
+    address: "Restoran Padang Rasa, Babakan Madang, Bogor",
+    customerType: "Restoran"
+  },
+  {
+    customerId: 6,
+    name: "Dewi Kartika",
+    email: "dewi.kartika@babakanmadang.com",
+    phone: "+62-817-7788-9900",
+    address: "Kafe Santai, Babakan Madang, Bogor",
+    customerType: "Kafe"
+  },
+  {
+    customerId: 7,
+    name: "Teguh Prasetyo",
+    email: "teguh.prasetyo@babakanmadang.com",
+    phone: "+62-812-5566-7788",
+    address: "Penginapan Asri, Babakan Madang, Bogor",
+    customerType: "Penginapan"
+  },
+  {
+    customerId: 8,
+    name: "Rina Apriani",
+    email: "rina.apriani@babakanmadang.com",
+    phone: "+62-816-4455-6677",
+    address: "Restoran Ayam Bakar, Babakan Madang, Bogor",
+    customerType: "Restoran"
+  },
+  {
+    customerId: 9,
+    name: "Eko Saputra",
+    email: "eko.saputra@babakanmadang.com",
+    phone: "+62-818-1234-5678",
+    address: "Kafe D'Bogor, Babakan Madang, Bogor",
+    customerType: "Kafe"
+  },
+  {
+    customerId: 10,
+    name: "Sri Handayani",
+    email: "sri.handayani@babakanmadang.com",
+    phone: "+62-814-9876-5432",
+    address: "Hotel Amanah, Babakan Madang, Bogor",
+    customerType: "Hotel"
+  },
+  {
+    customerId: 11,
+    name: "Rahmat Hidayat",
+    email: "rahmat.hidayat@babakanmadang.com",
+    phone: "+62-822-5678-1234",
+    address: "Restoran Nusantara, Babakan Madang, Bogor",
+    customerType: "Restoran"
+  },
+  {
+    customerId: 12,
+    name: "Maya Anjani",
+    email: "maya.anjani@babakanmadang.com",
+    phone: "+62-823-4455-6677",
+    address: "Kafe Senja Indah, Babakan Madang, Bogor",
+    customerType: "Kafe"
+  },
+  {
+    customerId: 13,
+    name: "Dimas Pratama",
+    email: "dimas.pratama@babakanmadang.com",
+    phone: "+62-821-3344-5566",
+    address: "Hotel Grand Madang, Babakan Madang, Bogor",
+    customerType: "Hotel"
+  },
+  {
+    customerId: 14,
+    name: "Rini Marlina",
+    email: "rini.marlina@babakanmadang.com",
+    phone: "+62-824-2233-1122",
+    address: "Warung Tenda Sari, Babakan Madang, Bogor",
+    customerType: "Warung Makan"
+  },
+  {
+    customerId: 15,
+    name: "Fajar Maulana",
+    email: "fajar.maulana@babakanmadang.com",
+    phone: "+62-828-5566-7788",
+    address: "Restoran Lezat, Babakan Madang, Bogor",
+    customerType: "Restoran"
+  },
+  {
+    customerId: 16,
+    name: "Fitri Yuliana",
+    email: "fitri.yuliana@babakanmadang.com",
+    phone: "+62-826-9988-7766",
+    address: "Kafe Bukit Hijau, Babakan Madang, Bogor",
+    customerType: "Kafe"
+  },
+  {
+    customerId: 17,
+    name: "Adi Prasetya",
+    email: "adi.prasetya@babakanmadang.com",
+    phone: "+62-829-4433-2211",
+    address: "Penginapan Lestari, Babakan Madang, Bogor",
+    customerType: "Penginapan"
+  },
+  {
+    customerId: 18,
+    name: "Lina Astuti",
+    email: "lina.astuti@babakanmadang.com",
+    phone: "+62-825-5677-3456",
+    address: "Warung Rakyat, Babakan Madang, Bogor",
+    customerType: "Warung Makan"
+  },
+  {
+    customerId: 19,
+    name: "Andi Susanto",
+    email: "andi.susanto@babakanmadang.com",
+    phone: "+62-818-6677-4455",
+    address: "Restoran Mewah, Babakan Madang, Bogor",
+    customerType: "Restoran"
+  },
+  {
+    customerId: 20,
+    name: "Nina Safitri",
+    email: "nina.safitri@babakanmadang.com",
+    phone: "+62-813-5544-7788",
+    address: "Kafe Malam Ceria, Babakan Madang, Bogor",
+    customerType: "Kafe"
+  }
+];
