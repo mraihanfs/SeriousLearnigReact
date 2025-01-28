@@ -30,15 +30,16 @@ import {
   CSSPROPERTYDIALOG,
   UPDATEBUTTON,
   DATANOTFOUND,
+  WORDINGDATATABLE,
 } from "../constants/PropertyCss";
 import { SEMBAKO_UNITS } from "../constants/DataInput";
 
-const dataNullProduct = {
-  id: null,
-  productName: null,
-  unit: null,
-  harga: null,
-};
+// const dataNullProduct = {
+//   id: null,
+//   productName: null,
+//   unit: null,
+//   harga: null,
+// };
 
 const Product = () => {
   const [dataProduct, setDataProduct] = useState(PRODUCTS);
@@ -48,7 +49,9 @@ const Product = () => {
   const [value, setValue] = useState("0");
   const uploadBulkFile = useRef(null);
 
-  const [valueAddProduct, setValueAddProduct] = useState({});
+  const [valueAddProduct, setValueAddProduct] = useState({
+    unit: "kg",
+  });
 
   const [valueUpdateProduct, setValueUpdateProduct] = useState({
     id: "",
@@ -205,13 +208,13 @@ const Product = () => {
     console.log(valueAddProduct);
     const id = dataProduct[dataProduct.length - 1].id + 1;
     PRODUCTS.push({ id, ...valueAddProduct });
+    console.log(valueAddProduct);
     setDataProduct((prevData) => [...prevData, { id, ...valueAddProduct }]);
     setValueAddProduct({
-      productName: "",
-      unit: "",
-      harga: "",
+      unit: "kg",
     });
     console.table(dataProduct);
+    handleCloseModal();
   };
 
   const onHandleUploadFile = (e) => {
@@ -305,6 +308,9 @@ const Product = () => {
         console.error("dataProduct is not an array:", dataProduct);
       }
       setDataProduct(oldData);
+      if (dataShow[dataShow.length - 1].length === 1) {
+        handleButtonPrevious(e);
+      }
       setDataDelete({
         openDelete: false,
         idButton: "",
@@ -547,7 +553,7 @@ const Product = () => {
                   href="/TemplateProduct.xlsx"
                   target="_blank"
                   rel="noreferrer"
-                  download="Template Upload Bulk"
+                  download="Template Upload Bulk Product"
                 >
                   Download Template
                 </a>
@@ -567,38 +573,40 @@ const Product = () => {
                 Upload
               </button>
             </header>
-            <table className="table-auto bg-white my-3 text-black overflow-y-auto w-full">
-              <thead className="border border-black">
-                <tr className="text-xl">
-                  {FIELDS_NAME_PRODUCT.map((field, index) => (
-                    <th key={index}>{field}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="text-center border border-black">
-                {dataAddBulkProduct.length > 0 &&
-                  dataAddBulkProduct[pageModal].map((product, index) => (
-                    <tr
-                      key={(index + 1) * (pageModal + 1)}
-                      className="border border-black"
-                    >
-                      <td>{(index + 1) * (pageModal + 1)}</td>
-                      <td>{product.productName}</td>
-                      <td>{product.unit}</td>
-                      <td>{product.harga}</td>
-                      <td>
-                        <button
-                          className={DELETEBUTTON}
-                          onClick={onDeleteData}
-                          id={"ItemAddBulk." + index}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto w-full">
+              <table className="table-auto w-full bg-white my-3 text-black border border-black">
+                <thead className="border border-black">
+                  <tr className="text-xl">
+                    {FIELDS_NAME_PRODUCT.map((field, index) => (
+                      <th key={index}>{field}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="text-center border border-black">
+                  {dataAddBulkProduct.length > 0 &&
+                    dataAddBulkProduct[pageModal].map((product, index) => (
+                      <tr
+                        key={(index + 1) * (pageModal + 1)}
+                        className="border border-black"
+                      >
+                        <td className={WORDINGDATATABLE}>{(index + 1) * (pageModal + 1)}</td>
+                        <td className={WORDINGDATATABLE}>{product.productName}</td>
+                        <td className={WORDINGDATATABLE}>{product.unit}</td>
+                        <td className={WORDINGDATATABLE}>{product.harga}</td>
+                        <td>
+                          <button
+                            className={DELETEBUTTON}
+                            onClick={onDeleteData}
+                            id={"ItemAddBulk." + index}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
             <button
               className="border mt-3 py-3 px-5 rounded-xl text-sans bg-slate-300"
               onClick={onSubmitBulkData}
@@ -624,7 +632,7 @@ const Product = () => {
             sx={{ color: "white" }}
           >
             {`Produk yang ingin anda hapus adalah ${
-              dataProduct.length>0 &&
+              dataProduct.length > 0 &&
               dataProduct[dataDelete.idProduct].productName
             }`}
           </DialogContentText>
@@ -656,7 +664,8 @@ const Product = () => {
         <DialogTitle id="alert-dialog-title">
           <header className="flex justify-between mb-2 items-center">
             <h2 className="text-white text-2xl font-bold font-sans">
-              {`Update Product Data ${ dataProduct.length > 0 &&
+              {`Update Product Data ${
+                dataProduct.length > 0 &&
                 dataProduct[dataUpdate.indexProduct].productName
               }`}
             </h2>

@@ -30,17 +30,18 @@ import {
   CSSPROPERTYDIALOG,
   UPDATEBUTTON,
   DATANOTFOUND,
+  WORDINGDATATABLE,
 } from "../constants/PropertyCss";
 import { CUSTOMER_TYPES } from "../constants/DataInput";
 
-const dataNullCustomer = {
-  customerID: null,
-  name: null,
-  email: null,
-  phone: null,
-  address: null,
-  customerType: null,
-};
+// const dataNullCustomer = {
+//   customerID: null,
+//   name: null,
+//   email: null,
+//   phone: null,
+//   address: null,
+//   customerType: null,
+// };
 
 const Customer = () => {
   const [dataCustomer, setDataCustomer] = useState(CUSTOMERS);
@@ -50,13 +51,17 @@ const Customer = () => {
   const [value, setValue] = useState("0");
   const uploadBulkFile = useRef(null);
 
-  const [valueAddCustomer, setValueAddCustomer] = useState({});
+  const [valueAddCustomer, setValueAddCustomer] = useState({
+    customerType: "Restoran",
+  });
 
   const [valueUpdateCustomer, setValueUpdateCustomer] = useState({
     id: "",
-    customerName: "",
-    unit: "",
-    harga: "",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    customerType: "Restoran",
   });
 
   const [valueAddBulkCustomer, setValueAddBulkCustomer] = useState([]);
@@ -198,16 +203,18 @@ const Customer = () => {
 
   const onHandlingSubmitAddCustomer = (e) => {
     e.preventDefault();
-    console.log(valueAddCustomer);
-    const id = dataCustomer[dataCustomer.length - 1].id + 1;
-    CUSTOMERS.push({ id, ...valueAddCustomer });
-    setDataCustomer((prevData) => [...prevData, { id, ...valueAddCustomer }]);
+    const customerId = dataCustomer[dataCustomer.length - 1].customerId + 1;
+    // console.table({customerId, ...valueAddCustomer}),
+    CUSTOMERS.push({ customerId, ...valueAddCustomer });
+    setDataCustomer((prevData) => [
+      ...prevData,
+      { customerId, ...valueAddCustomer },
+    ]);
     setValueAddCustomer({
-      customerName: "",
-      unit: "",
-      harga: "",
+      customerType: "Restoran",
     });
-    console.table(dataCustomer);
+    // console.table(dataCustomer);
+    handleCloseModal();
   };
 
   const onHandleUploadFile = (e) => {
@@ -257,7 +264,7 @@ const Customer = () => {
     setDataShow(seperateData(newDatatoAdd));
     setValueAddBulkCustomer([]);
     setDataAddBulkCustomer([]);
-    setOpenModal(!openModal);
+    handleCloseModal();
   };
 
   const onDeleteData = (e) => {
@@ -290,6 +297,7 @@ const Customer = () => {
         if (idItem >= 0 && idItem < oldData.length) {
           oldData.splice(idItem, 1);
           CUSTOMERS.splice(idItem, 1);
+
           // console.log("This old Data after delete:");
           // console.table(oldData);
           // console.log("This customers data after delete:");
@@ -301,6 +309,13 @@ const Customer = () => {
         console.error("dataCustomer is not an array:", dataCustomer);
       }
       setDataCustomer(oldData);
+      // console.log("Page before update: ", page);
+      // console.log("dataShow length: ", dataShow[dataShow.length - 1].length);
+      // console.log("Check condition is run ", dataShow[dataShow.length - 1].length === 1)
+      if (dataShow[dataShow.length - 1].length === 1) {
+        handleButtonPrevious(e);
+      }
+      console.log("Page after update: ", page);
       setDataDelete({
         openDelete: false,
         idButton: "",
@@ -311,14 +326,8 @@ const Customer = () => {
 
   const onHandleInputChangeUpdate = (e) => {
     const { name, value } = e.target;
-    if (name === "harga") {
-      setValueUpdateCustomer({
-        ...valueUpdateCustomer,
-        [name]: parseFloat(value),
-      });
-    } else {
-      setValueUpdateCustomer({ ...valueUpdateCustomer, [name]: value });
-    }
+
+    setValueUpdateCustomer({ ...valueUpdateCustomer, [name]: value });
   };
 
   const onUpdateData = (e) => {
@@ -388,53 +397,55 @@ const Customer = () => {
           </button>
         </div>
       </div>
-      <table className="table-auto bg-white m-3 text-black overflow-y-auto">
-        <thead className="border border-black">
-          <tr className="text-xl">
-            {FIELDS_NAME_CUSTOMER.map((field, index) => (
-              <th key={index}>{field}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="text-center border border-black">
-          {dataShow.length > 0 ? (
-            dataShow[page].map((customer, index) => (
-              <tr key={customer.id} className="border border-black">
-                <td>{page * 10 + index + 1}</td>
-                <td>{customer.name}</td>
-                <td>{customer.email}</td>
-                <td>{customer.phone}</td>
-                <td>{customer.address}</td>
-                <td>{customer.customerType}</td>
-                <td>
-                  <button
-                    className={UPDATEBUTTON}
-                    id={"updateCustomer." + (page * 10 + index)}
-                    onClick={handleOpenDialogUpdate}
-                  >
-                    Update
-                  </button>
-                </td>
-                <td>
-                  <button
-                    className={DELETEBUTTON}
-                    id={"deleteCustomer." + (page * 10 + index)}
-                    onClick={handleOpenDialogDelete}
-                  >
-                    Delete
-                  </button>
+      <div className="overflow-x-auto w-full">
+        <table className="table-auto bg-white m-3 text-black overflow-y-auto">
+          <thead className="border border-black">
+            <tr className="text-xl">
+              {FIELDS_NAME_CUSTOMER.map((field, index) => (
+                <th key={index}>{field}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="text-center border border-black">
+            {dataShow.length > 0 ? (
+              dataShow[page].map((customer, index) => (
+                <tr key={customer.id} className="border border-black">
+                  <td>{page * 10 + index + 1}</td>
+                  <td>{customer.name}</td>
+                  <td>{customer.email}</td>
+                  <td>{customer.phone}</td>
+                  <td>{customer.address}</td>
+                  <td>{customer.customerType}</td>
+                  <td>
+                    <button
+                      className={UPDATEBUTTON}
+                      id={"updateCustomer." + (page * 10 + index)}
+                      onClick={handleOpenDialogUpdate}
+                    >
+                      Update
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className={DELETEBUTTON}
+                      id={"deleteCustomer." + (page * 10 + index)}
+                      onClick={handleOpenDialogDelete}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className={DATANOTFOUND}>
+                  No Customer available.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className={DATANOTFOUND}>
-                No Customer available.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
       <div className="flex text-white justify-end m-3">
         <div className="flex border border-white text-3xl items-center rounded-lg">
           <MdSkipPrevious
@@ -523,16 +534,16 @@ const Customer = () => {
                 <span className="text-white block">Jenis Pelanggan</span>
                 <select
                   type="text"
-                  name="unit"
-                  id="unit"
+                  name="customerType"
+                  id="customerType"
                   className="mt-1 block form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-full"
                   onChange={onHandleInputChange}
                 >
                   {CUSTOMER_TYPES.length > 0 &&
-                    CUSTOMER_TYPES.map((unit, index) => (
-                      <option key={index} value={unit}>
-                        {unit}
+                    CUSTOMER_TYPES.map((customerType, index) => (
+                      <option key={index} value={customerType}>
+                        {customerType}
                       </option>
                     ))}
                 </select>
@@ -567,7 +578,7 @@ const Customer = () => {
                   href="/TemplateCustomer.xlsx"
                   target="_blank"
                   rel="noreferrer"
-                  download="Template Upload Bulk"
+                  download="Template Upload Bulk Customer"
                 >
                   Download Template
                 </a>
@@ -587,47 +598,61 @@ const Customer = () => {
                 Upload
               </button>
             </header>
-            <table className="table-auto bg-white my-3 text-black overflow-y-auto w-full">
-              <thead className="border border-black">
-                <tr className="text-xl">
-                  {FIELDS_NAME_CUSTOMER.map((field, index) => (
-                    <th key={index}>{field}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="text-center border border-black">
-                {dataAddBulkCustomer.length > 0 ? (
-                  dataAddBulkCustomer[pageModal].map((customer, index) => (
-                    <tr
-                      key={(index + 1) * (pageModal + 1)}
-                      className="border border-black"
-                    >
-                      <td>{page * 10 + index + 1}</td>
-                      <td>{customer.name}</td>
-                      <td>{customer.email}</td>
-                      <td>{customer.phone}</td>
-                      <td>{customer.address}</td>
-                      <td>{customer.customerType}</td>
-                      <td>
-                        <button
-                          className={DELETEBUTTON}
-                          onClick={onDeleteData}
-                          id={"ItemAddBulk." + index}
-                        >
-                          Delete
-                        </button>
+            <div className="overflow-x-auto w-full">
+              <table className="table-auto w-full bg-white my-3 text-black border border-black">
+                <thead className="border border-black">
+                  <tr className="text-lg">
+                    {FIELDS_NAME_CUSTOMER.map((field, index) => (
+                      <th
+                        key={index}
+                        className="px-4 py-2 border border-black whitespace-nowrap"
+                      >
+                        {field}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="text-center border border-black max-w-fit">
+                  {dataAddBulkCustomer.length > 0 ? (
+                    dataAddBulkCustomer[pageModal].map((customer, index) => (
+                      <tr
+                        key={(index + 1) * (pageModal + 1)}
+                        className="border border-black odd:bg-white even:bg-gray-300"
+                      >
+                        <td className={WORDINGDATATABLE}>
+                          {page * 10 + index + 1}
+                        </td>
+                        <td className={WORDINGDATATABLE}>{customer.name}</td>
+                        <td className={WORDINGDATATABLE}>{customer.email}</td>
+                        <td className={WORDINGDATATABLE}>{customer.phone}</td>
+                        <td className={WORDINGDATATABLE}>{customer.address}</td>
+                        <td className={WORDINGDATATABLE}>
+                          {customer.customerType}
+                        </td>
+                        <td className={WORDINGDATATABLE}>
+                          <button
+                            className={DELETEBUTTON}
+                            onClick={onDeleteData}
+                            id={"ItemAddBulk." + index}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="px-4 py-3 text-center text-gray-500"
+                      >
+                        Data Customer belum di upload
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="text-center">
-                      Data Customer tidak tersedia
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
             <button
               className="border mt-3 py-3 px-5 rounded-xl text-sans bg-slate-300"
               onClick={onSubmitBulkData}
@@ -684,7 +709,7 @@ const Customer = () => {
       >
         <DialogTitle id="alert-dialog-title">
           <header className="flex justify-between mb-2 items-center">
-            <h2 className="text-white text-2xl font-bold font-sans">
+            <h2 className="text-black text-2xl font-bold font-sans">
               {`Update Customer Data ${
                 dataCustomer.length > 0 &&
                 dataCustomer[dataUpdate.indexCustomer].name
@@ -693,53 +718,56 @@ const Customer = () => {
           </header>
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText
+            id="alert-dialog-description"
+            className="text-black"
+          >
             <label className="block">
-              <span className="text-white block">Nama Customer</span>
+              <span className="text-black block">Nama Customer</span>
               <input
                 type="text"
                 name="name"
                 id="name"
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
-                onChange={onHandleInputChange}
+                onChange={onHandleInputChangeUpdate}
                 value={valueUpdateCustomer.name}
               />
             </label>
             <label className="block">
-              <span className="text-white block">Alamat Pelanggan</span>
+              <span className="text-black block">Alamat Pelanggan</span>
               <input
                 type="text"
                 name="address"
                 id="address"
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
-                onChange={onHandleInputChange}
+                onChange={onHandleInputChangeUpdate}
                 value={valueUpdateCustomer.address}
               />
             </label>
             <label className="block">
-              <span className="text-white block">E-mail Pelanggan</span>
+              <span className="text-black block">E-mail Pelanggan</span>
               <input
                 type="email"
                 name="email"
                 id="email"
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
-                onChange={onHandleInputChange}
+                onChange={onHandleInputChangeUpdate}
                 value={valueUpdateCustomer.email}
               />
             </label>
             <div className="flex w-full my-3">
               <label className="inline w-1/2 me-3">
-                <span className="text-white block">Jenis Pelanggan</span>
+                <span className="text-black block">Jenis Pelanggan</span>
                 <select
                   type="text"
-                  name="unit"
-                  id="unit"
+                  name="customerType"
+                  id="customerType"
                   className="mt-1 block form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-full"
-                  onChange={onHandleInputChange}
+                  onChange={onHandleInputChangeUpdate}
                   value={valueUpdateCustomer.customerType}
                 >
                   {CUSTOMER_TYPES.length > 0 &&
@@ -751,14 +779,14 @@ const Customer = () => {
                 </select>
               </label>
               <label className="inline w-1/2">
-                <span className="text-white block">No. HP Pelanggan</span>
+                <span className="text-black block">No. HP Pelanggan</span>
                 <input
                   type="tel"
                   name="phone"
                   id="phone"
                   className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
-                  onChange={onHandleInputChange}
+                  onChange={onHandleInputChangeUpdate}
                   value={valueUpdateCustomer.phone}
                 />
               </label>

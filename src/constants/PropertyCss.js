@@ -25,3 +25,4 @@ export const CANCELBUTTON =
 export const UPDATEBUTTON =
   "rounded-xl bg-yellow-600 text-white my-1 p-1 hover:bg-yellow-300 hover:text-black";
 export const DATANOTFOUND = "text-center text-4xl font-bold"
+export const WORDINGDATATABLE = "px-4 py-2 border border-black"

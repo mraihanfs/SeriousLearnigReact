@@ -761,5 +761,13 @@ export const CUSTOMERS = [
     phone: "+62-813-5544-7788",
     address: "Kafe Malam Ceria, Babakan Madang, Bogor",
     customerType: "Kafe"
+  },
+  {
+    customerId: 20,
+    name: "Nina Safitri",
+    email: "nina.safitri@babakanmadang.com",
+    phone: "+62-813-5544-7788",
+    address: "Kafe Malam Ceria, Babakan Madang, Bogor",
+    customerType: "Kafe"
   }
 ];
