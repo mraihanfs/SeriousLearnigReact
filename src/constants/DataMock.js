@@ -771,3 +771,154 @@ export const CUSTOMERS = [
     customerType: "Kafe"
   }
 ];
+
+export const TRANSACTION = [
+  {
+    "transactionID": 1,
+    "customerID": 20,
+    "name": "Nina Safitri",
+    "email": "nina.safitri@babakanmadang.com",
+    "phone": "+62-813-5544-7788",
+    "address": "Kafe Malam Ceria, Babakan Madang, Bogor",
+    "productToBuy": [
+      {
+        "productID": 1,
+        "productName": "Product 1",
+        "unit": "box",
+        "price": 1035.67,
+        "qty": 3,
+        "total": 3107.01
+      },
+      {
+        "productID": 2,
+        "productName": "Product 2",
+        "unit": "bottle",
+        "price": 500.50,
+        "qty": 2,
+        "total": 1001.00
+      }
+    ],
+    "sum": 4108.01,
+    "timestamp": "2024-01-30T10:15:20Z"
+  },
+  {
+    "transactionID": 2,
+    "customerID": 21,
+    "name": "Andi Wijaya",
+    "email": "andi.wijaya@jakarta.com",
+    "phone": "+62-812-9988-7766",
+    "address": "Warung Kopi Santai, Jakarta",
+    "productToBuy": [
+      {
+        "productID": 3,
+        "productName": "Product 3",
+        "unit": "pack",
+        "price": 250.75,
+        "qty": 4,
+        "total": 1003.00
+      },
+      {
+        "productID": 4,
+        "productName": "Product 4",
+        "unit": "kg",
+        "price": 1500.00,
+        "qty": 2,
+        "total": 3000.00
+      }
+    ],
+    "sum": 4003.00,
+    "timestamp": "2024-01-30T11:45:32Z"
+  },
+  {
+    "transactionID": 3,
+    "customerID": 22,
+    "name": "Siti Rahma",
+    "email": "siti.rahma@depok.com",
+    "phone": "+62-813-2255-6677",
+    "address": "Toko Maju Jaya, Depok",
+    "productToBuy": [
+      {
+        "productID": 5,
+        "productName": "Product 5",
+        "unit": "litre",
+        "price": 780.25,
+        "qty": 5,
+        "total": 3901.25
+      },
+      {
+        "productID": 1,
+        "productName": "Product 1",
+        "unit": "box",
+        "price": 1035.67,
+        "qty": 2,
+        "total": 2071.34
+      }
+    ],
+    "sum": 5972.59,
+    "timestamp": "2024-01-30T12:30:10Z"
+  },
+  {
+    "transactionID": 4,
+    "customerID": 23,
+    "name": "Budi Santoso",
+    "email": "budi.santoso@bandung.com",
+    "phone": "+62-812-3344-5566",
+    "address": "Warung Sejahtera, Bandung",
+    "productToBuy": [
+      {
+        "productID": 6,
+        "productName": "Product 6",
+        "unit": "gram",
+        "price": 89.99,
+        "qty": 10,
+        "total": 899.90
+      },
+      {
+        "productID": 2,
+        "productName": "Product 2",
+        "unit": "bottle",
+        "price": 500.50,
+        "qty": 3,
+        "total": 1501.50
+      },
+      {
+        "productID": 7,
+        "productName": "Product 7",
+        "unit": "set",
+        "price": 1250.75,
+        "qty": 1,
+        "total": 1250.75
+      }
+    ],
+    "sum": 3652.15,
+    "timestamp": "2024-01-30T13:05:55Z"
+  },
+  {
+    "transactionID": 5,
+    "customerID": 24,
+    "name": "Dewi Kartika",
+    "email": "dewi.kartika@semarang.com",
+    "phone": "+62-811-9988-7766",
+    "address": "Toko Serba Ada, Semarang",
+    "productToBuy": [
+      {
+        "productID": 8,
+        "productName": "Product 8",
+        "unit": "meter",
+        "price": 350.50,
+        "qty": 6,
+        "total": 2103.00
+      },
+      {
+        "productID": 3,
+        "productName": "Product 3",
+        "unit": "pack",
+        "price": 250.75,
+        "qty": 5,
+        "total": 1253.75
+      }
+    ],
+    "sum": 3356.75,
+    "timestamp": "2024-01-30T14:20:40Z"
+  }
+]

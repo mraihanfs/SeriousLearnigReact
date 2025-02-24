@@ -45,7 +45,7 @@ const Navbar = ({ navShow, onRenderData }) => {
         <li
           className="flex mt-3 hover:cursor-pointer"
           key="report"
-          onClick={() => sendData("report")}
+          onClick={() => sendData("transaction")}
         >
           <MdOutlineInsertChart className="text-3xl mx-1" />
           <h2 className={navShow ? "" : "hidden"}>Transaction</h2>

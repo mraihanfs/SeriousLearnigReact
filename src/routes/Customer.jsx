@@ -397,55 +397,55 @@ const Customer = () => {
           </button>
         </div>
       </div>
-      <div className="overflow-x-auto w-full">
-        <table className="table-auto bg-white m-3 text-black overflow-y-auto">
-          <thead className="border border-black">
-            <tr className="text-xl">
-              {FIELDS_NAME_CUSTOMER.map((field, index) => (
-                <th key={index}>{field}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="text-center border border-black">
-            {dataShow.length > 0 ? (
-              dataShow[page].map((customer, index) => (
-                <tr key={customer.id} className="border border-black">
-                  <td>{page * 10 + index + 1}</td>
-                  <td>{customer.name}</td>
-                  <td>{customer.email}</td>
-                  <td>{customer.phone}</td>
-                  <td>{customer.address}</td>
-                  <td>{customer.customerType}</td>
-                  <td>
-                    <button
-                      className={UPDATEBUTTON}
-                      id={"updateCustomer." + (page * 10 + index)}
-                      onClick={handleOpenDialogUpdate}
-                    >
-                      Update
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      className={DELETEBUTTON}
-                      id={"deleteCustomer." + (page * 10 + index)}
-                      onClick={handleOpenDialogDelete}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className={DATANOTFOUND}>
-                  No Customer available.
+
+      <table className="table-auto bg-white m-3 text-black overflow-y-auto">
+        <thead className="border border-black">
+          <tr className="text-xl">
+            {FIELDS_NAME_CUSTOMER.map((field, index) => (
+              <th key={index}>{field}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="text-center border border-black">
+          {dataShow.length > 0 ? (
+            dataShow[page].map((customer, index) => (
+              <tr key={customer.id} className="border border-black">
+                <td>{page * 10 + index + 1}</td>
+                <td>{customer.name}</td>
+                <td>{customer.email}</td>
+                <td>{customer.phone}</td>
+                <td>{customer.address}</td>
+                <td>{customer.customerType}</td>
+                <td>
+                  <button
+                    className={UPDATEBUTTON}
+                    id={"updateCustomer." + (page * 10 + index)}
+                    onClick={handleOpenDialogUpdate}
+                  >
+                    Update
+                  </button>
+                </td>
+                <td>
+                  <button
+                    className={DELETEBUTTON}
+                    id={"deleteCustomer." + (page * 10 + index)}
+                    onClick={handleOpenDialogDelete}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className={DATANOTFOUND}>
+                No Customer available.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
       <div className="flex text-white justify-end m-3">
         <div className="flex border border-white text-3xl items-center rounded-lg">
           <MdSkipPrevious

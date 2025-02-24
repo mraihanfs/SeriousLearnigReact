@@ -9,7 +9,7 @@ const Dashboard = React.lazy(() => import("./Dashboard"));
 const Customer = React.lazy(() => import("./Customer"));
 const Product = React.lazy(() => import("./Product"));
 // const Compare = React.lazy(() => import("./Compare"));
-// const Transaction = React.lazy(() => import("./Transaction"));
+const Transaction = React.lazy(() => import("./Transaction"));
 
 const Home = () => {
   const [isNavShow, setIsNavShow] = useState(true);
@@ -28,8 +28,8 @@ const Home = () => {
         return <Customer />;
       case "product":
         return <Product />;
-      // case "transaction":
-      //   return <Transaction />;
+      case "transaction":
+        return <Transaction />;
       // case "compare":
       //   return <Compare />;
     }

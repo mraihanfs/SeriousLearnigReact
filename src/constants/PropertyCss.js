@@ -15,6 +15,7 @@ export const CSSPROPERTYDIALOG = {
   "& .MuiPaper-root": {
     backgroundColor: "darkgray !important",
     color: "white !important",
+    width: "100% !important",
   },
 };
 
@@ -26,3 +27,4 @@ export const UPDATEBUTTON =
   "rounded-xl bg-yellow-600 text-white my-1 p-1 hover:bg-yellow-300 hover:text-black";
 export const DATANOTFOUND = "text-center text-4xl font-bold"
 export const WORDINGDATATABLE = "px-4 py-2 border border-black"
+export const ADDBUTTON = "rounded-xl bg-green-600 text-white font-bold h-12 my-5 me-5 ms-2 w-32 hover:cursor-pointer"

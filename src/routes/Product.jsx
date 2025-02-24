@@ -33,6 +33,7 @@ import {
   WORDINGDATATABLE,
 } from "../constants/PropertyCss";
 import { SEMBAKO_UNITS } from "../constants/DataInput";
+import { changeCurrencyForm } from "../helper/convert";
 
 // const dataNullProduct = {
 //   id: null,
@@ -413,7 +414,7 @@ const Product = () => {
                 <td>{page * 10 + index + 1}</td>
                 <td>{product.productName}</td>
                 <td>{product.unit}</td>
-                <td>{product.harga}</td>
+                <td>{changeCurrencyForm(product.harga)}</td>
                 <td>
                   <button
                     className={UPDATEBUTTON}
@@ -592,7 +593,7 @@ const Product = () => {
                         <td className={WORDINGDATATABLE}>{(index + 1) * (pageModal + 1)}</td>
                         <td className={WORDINGDATATABLE}>{product.productName}</td>
                         <td className={WORDINGDATATABLE}>{product.unit}</td>
-                        <td className={WORDINGDATATABLE}>{product.harga}</td>
+                        <td className={WORDINGDATATABLE}>{changeCurrencyForm(product.harga)}</td>
                         <td>
                           <button
                             className={DELETEBUTTON}
