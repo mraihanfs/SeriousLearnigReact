@@ -46,6 +46,7 @@ import DividerHorizontal from "../components/DividerHorizontal";
 import {
   calculateTotal,
   calculateTotalPerProduct,
+  getDateTimeNow,
 } from "../helper/calculation";
 
 // const dataNullCustomer = {
@@ -58,7 +59,7 @@ import {
 // };
 
 const productNull = {
-  productID: 0,
+  id: 0,
   productName: "",
   unit: "",
   harga: 0,
@@ -118,7 +119,6 @@ const Transaction = () => {
   useEffect(() => {
     setDataShow(seperateData(dataTransaction));
     setDataAddBulkTransaction(seperateData(valueAddBulkTransaction));
-    console.log(valueAddBulkTransaction);
   }, [dataTransaction, valueAddBulkTransaction]);
 
   const findTransactionByName = (e) => {
@@ -158,7 +158,7 @@ const Transaction = () => {
 
   const handleButtonNext = (e) => {
     e.preventDefault();
-    if (page !== 10) {
+    if (page !== dataShow.length - 1) {
       setPage(page + 1);
     }
     console.log(page);
@@ -166,7 +166,7 @@ const Transaction = () => {
 
   const handleButtonNextLast = (e) => {
     e.preventDefault();
-    if (page !== 10) {
+    if (page !== dataShow.length - 1) {
       setPage(dataShow.length - 1);
     }
     console.log(page);
@@ -177,6 +177,19 @@ const Transaction = () => {
   };
   const handleCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const emptyAddTransaction = () => {
+    setCustomerSelected({
+      customerId: null,
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      customerType: "",
+    });
+    setListProduct([]);
+    setSum(0);
   };
 
   const handleOpenDialogDelete = (e) => {
@@ -239,18 +252,23 @@ const Transaction = () => {
 
   const onHandlingSubmitAddTransaction = (e) => {
     e.preventDefault();
+    const oldData = [...dataTransaction]
     const transactionId =
       dataTransaction[dataTransaction.length - 1].transactionID + 1;
-    // console.table({customerId, ...valueAddCustomer}),
-    TRANSACTION.push({ transactionID: transactionId, ...valueAddTransaction });
-    setDataTransaction((prevData) => [
-      ...prevData,
-      { transactionId: transactionId, ...valueAddTransaction },
-    ]);
-    setValueAddTransaction({
-      transactionType: "Restoran",
-    });
-    // console.table(dataCustomer);
+    const timestamp = getDateTimeNow();
+    const newDataTransaction = {
+      transactionId: transactionId,
+      ...customerSelected,
+      productToBuy: listProduct,
+      sum,
+      timestamp
+    };
+    // console.log(newDataTransaction),
+    TRANSACTION.push(newDataTransaction);
+    oldData.push(newDataTransaction);
+    setDataTransaction(oldData);
+    console.table(dataTransaction);
+    emptyAddTransaction();
     handleCloseModal();
   };
 
@@ -849,9 +867,7 @@ const Transaction = () => {
                         Total Transaksi
                       </td>
                       <td className="text-center font-bold">
-                        {changeCurrencyForm(
-                          sum
-                        )}
+                        {changeCurrencyForm(sum)}
                       </td>
                     </tr>
                   </>
@@ -1084,7 +1100,7 @@ const Transaction = () => {
                         <td className="px-3">{product.productName}</td>
                         <td className="text-center px-3">{product.unit}</td>
                         <td className="px-3">
-                          {changeCurrencyForm(product.price)}
+                          {changeCurrencyForm(product.harga)}
                         </td>
                         <td className="text-center px-3">{product.qty}</td>
                         <td className="px-3">

@@ -9,3 +9,9 @@ export const calculateTotal = (listProduct, key) => {
     })
     return total
 }
+
+export const getDateTimeNow = () => {
+    const now = new Date();
+    const gm7Date = now.toISOString().split('.')[0]+'Z';
+    return gm7Date;
+}

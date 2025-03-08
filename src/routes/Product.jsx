@@ -79,7 +79,6 @@ const Product = () => {
   useEffect(() => {
     setDataShow(seperateData(dataProduct));
     setDataAddBulkProduct(seperateData(valueAddBulkProduct));
-    // console.log(valueAddBulkProduct);
   }, [dataProduct, valueAddBulkProduct]);
 
   const findProductByName = (e) => {
@@ -121,7 +120,7 @@ const Product = () => {
 
   const handleButtonNext = (e) => {
     e.preventDefault();
-    if (page !== 10) {
+    if (page !== dataShow.length - 1) {
       setPage(page + 1);
     }
     console.log(page);
@@ -129,7 +128,7 @@ const Product = () => {
 
   const handleButtonNextLast = (e) => {
     e.preventDefault();
-    if (page !== 10) {
+    if (page !== dataShow.length - 1) {
       setPage(dataShow.length - 1);
     }
     console.log(page);
@@ -207,14 +206,14 @@ const Product = () => {
   const onHandlingSubmitAddProduct = (e) => {
     e.preventDefault();
     console.log(valueAddProduct);
+    const oldProduct = [...dataProduct]
     const id = dataProduct[dataProduct.length - 1].id + 1;
     PRODUCTS.push({ id, ...valueAddProduct });
-    console.log(valueAddProduct);
-    setDataProduct((prevData) => [...prevData, { id, ...valueAddProduct }]);
+    oldProduct.push({ id, ...valueAddProduct })
+    setDataProduct(oldProduct);
     setValueAddProduct({
       unit: "kg",
     });
-    console.table(dataProduct);
     handleCloseModal();
   };
 

@@ -82,7 +82,6 @@ const Customer = () => {
   useEffect(() => {
     setDataShow(seperateData(dataCustomer));
     setDataAddBulkCustomer(seperateData(valueAddBulkCustomer));
-    console.log(valueAddBulkCustomer);
   }, [dataCustomer, valueAddBulkCustomer]);
 
   const findCustomerByName = (e) => {
@@ -122,7 +121,7 @@ const Customer = () => {
 
   const handleButtonNext = (e) => {
     e.preventDefault();
-    if (page !== 10) {
+    if (page !== dataShow.length - 1) {
       setPage(page + 1);
     }
     console.log(page);
@@ -130,7 +129,7 @@ const Customer = () => {
 
   const handleButtonNextLast = (e) => {
     e.preventDefault();
-    if (page !== 10) {
+    if (page !== dataShow.length - 1) {
       setPage(dataShow.length - 1);
     }
     console.log(page);
@@ -203,13 +202,11 @@ const Customer = () => {
 
   const onHandlingSubmitAddCustomer = (e) => {
     e.preventDefault();
+    const oldData = [...dataCustomer]
     const customerId = dataCustomer[dataCustomer.length - 1].customerId + 1;
-    // console.table({customerId, ...valueAddCustomer}),
     CUSTOMERS.push({ customerId, ...valueAddCustomer });
-    setDataCustomer((prevData) => [
-      ...prevData,
-      { customerId, ...valueAddCustomer },
-    ]);
+    oldData.push({ customerId, ...valueAddCustomer });
+    setDataCustomer(oldData);
     setValueAddCustomer({
       customerType: "Restoran",
     });

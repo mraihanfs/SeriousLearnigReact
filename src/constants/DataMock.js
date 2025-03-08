@@ -782,18 +782,18 @@ export const TRANSACTION = [
     "address": "Kafe Malam Ceria, Babakan Madang, Bogor",
     "productToBuy": [
       {
-        "productID": 1,
+        "id": 1,
         "productName": "Product 1",
         "unit": "box",
-        "price": 1035.67,
+        "harga": 1035.67,
         "qty": 3,
         "total": 3107.01
       },
       {
-        "productID": 2,
+        "id": 2,
         "productName": "Product 2",
         "unit": "bottle",
-        "price": 500.50,
+        "harga": 500.50,
         "qty": 2,
         "total": 1001.00
       }
@@ -810,18 +810,18 @@ export const TRANSACTION = [
     "address": "Warung Kopi Santai, Jakarta",
     "productToBuy": [
       {
-        "productID": 3,
+        "id": 3,
         "productName": "Product 3",
         "unit": "pack",
-        "price": 250.75,
+        "harga": 250.75,
         "qty": 4,
         "total": 1003.00
       },
       {
-        "productID": 4,
+        "id": 4,
         "productName": "Product 4",
         "unit": "kg",
-        "price": 1500.00,
+        "harga": 1500.00,
         "qty": 2,
         "total": 3000.00
       }
@@ -838,18 +838,18 @@ export const TRANSACTION = [
     "address": "Toko Maju Jaya, Depok",
     "productToBuy": [
       {
-        "productID": 5,
+        "id": 5,
         "productName": "Product 5",
         "unit": "litre",
-        "price": 780.25,
+        "harga": 780.25,
         "qty": 5,
         "total": 3901.25
       },
       {
-        "productID": 1,
+        "id": 1,
         "productName": "Product 1",
         "unit": "box",
-        "price": 1035.67,
+        "harga": 1035.67,
         "qty": 2,
         "total": 2071.34
       }
@@ -866,26 +866,26 @@ export const TRANSACTION = [
     "address": "Warung Sejahtera, Bandung",
     "productToBuy": [
       {
-        "productID": 6,
+        "id": 6,
         "productName": "Product 6",
         "unit": "gram",
-        "price": 89.99,
+        "harga": 89.99,
         "qty": 10,
         "total": 899.90
       },
       {
-        "productID": 2,
+        "id": 2,
         "productName": "Product 2",
         "unit": "bottle",
-        "price": 500.50,
+        "harga": 500.50,
         "qty": 3,
         "total": 1501.50
       },
       {
-        "productID": 7,
+        "id": 7,
         "productName": "Product 7",
         "unit": "set",
-        "price": 1250.75,
+        "harga": 1250.75,
         "qty": 1,
         "total": 1250.75
       }
@@ -902,18 +902,18 @@ export const TRANSACTION = [
     "address": "Toko Serba Ada, Semarang",
     "productToBuy": [
       {
-        "productID": 8,
+        "id": 8,
         "productName": "Product 8",
         "unit": "meter",
-        "price": 350.50,
+        "harga": 350.50,
         "qty": 6,
         "total": 2103.00
       },
       {
-        "productID": 3,
+        "id": 3,
         "productName": "Product 3",
         "unit": "pack",
-        "price": 250.75,
+        "harga": 250.75,
         "qty": 5,
         "total": 1253.75
       }
