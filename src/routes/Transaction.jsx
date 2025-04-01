@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import TabPanel from "../components/TabPanel";
 
-import { CUSTOMERS, PRODUCTS, TRANSACTION } from "../constants/DataMock";
+import { CUSTOMERS, PRODUCTS } from "../constants/DataMock";
 import {
   FIELDS_NAME_PRODUCT_OF_TRANSACTION,
   FIELDS_NAME_TRANSACTION,
@@ -35,6 +35,7 @@ import {
   DATANOTFOUND,
   WORDINGDATATABLE,
   ADDBUTTON,
+  VALIDATIONRULE,
 } from "../constants/PropertyCss";
 import {
   changeCurrencyForm,
@@ -47,7 +48,13 @@ import {
   calculateTotal,
   calculateTotalPerProduct,
   getDateTimeNow,
+  reduceNumber,
 } from "../helper/calculation";
+import transactionService from "../services/transactionService";
+import { responseTransaction } from "../helper/inquiryData";
+import { useFieldArray, useForm } from "react-hook-form";
+import { VALIDATION_ERROR_ADD } from "../constants/DataInput";
+import DialogValidation from "../components/DialogValidation";
 
 // const dataNullCustomer = {
 //   customerID: null,
@@ -68,12 +75,36 @@ const productNull = {
 };
 
 const Transaction = () => {
-  const [dataTransaction, setDataTransaction] = useState(TRANSACTION);
+  const rawDataTransaction = responseTransaction.read();
+  // console.log(rawDataTransaction);
+  const [dataTransaction, setDataTransaction] = useState(rawDataTransaction);
   const [dataShow, setDataShow] = useState([]);
   const [page, setPage] = useState(0);
   const [openModal, setOpenModal] = useState(0);
-  const [value, setValue] = useState("0");
+  const [valueTab, setValueTab] = useState("0");
   const uploadBulkFile = useRef(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    control,
+    getValues,
+    setValue,
+  } = useForm({
+    mode: "onChange",
+    reValidateMode: "onChange",
+    // defaultValues: {
+    //   // productToBuy: [{ product: "", qty: 0, total: 0 }],
+    // },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "productToBuy",
+  });
 
   const [valueAddTransaction, setValueAddTransaction] = useState({
     transactionType: "Restoran",
@@ -116,6 +147,15 @@ const Transaction = () => {
 
   const [listProduct, setListProduct] = useState([]);
 
+  const dataCustomer = watch("customer", "");
+  const dataProductToBuy = watch("productToBuy");
+
+  const [attrDialogValidation, setAttrDialogValidation] = useState({
+    open: false,
+    content: {},
+    handling: null,
+  });
+
   useEffect(() => {
     setDataShow(seperateData(dataTransaction));
     setDataAddBulkTransaction(seperateData(valueAddBulkTransaction));
@@ -125,7 +165,7 @@ const Transaction = () => {
     e.preventDefault();
     const searchQuery = e.target.value.toLowerCase();
     if (!searchQuery) {
-      setDataTransaction(TRANSACTION);
+      setDataTransaction(rawDataTransaction);
       setPage(0);
     } else {
       const filteredTransaction = dataTransaction.filter(
@@ -177,6 +217,7 @@ const Transaction = () => {
   };
   const handleCloseModal = () => {
     setOpenModal(false);
+    reset();
   };
 
   const emptyAddTransaction = () => {
@@ -242,7 +283,7 @@ const Transaction = () => {
   };
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setValueTab(newValue);
   };
 
   const onHandleInputChange = (e) => {
@@ -250,26 +291,49 @@ const Transaction = () => {
     setValueAddTransaction({ ...valueAddTransaction, [name]: value });
   };
 
-  const onHandlingSubmitAddTransaction = (e) => {
-    e.preventDefault();
-    const oldData = [...dataTransaction]
-    const transactionId =
-      dataTransaction[dataTransaction.length - 1].transactionID + 1;
-    const timestamp = getDateTimeNow();
-    const newDataTransaction = {
-      transactionId: transactionId,
-      ...customerSelected,
-      productToBuy: listProduct,
-      sum,
-      timestamp
-    };
-    // console.log(newDataTransaction),
-    TRANSACTION.push(newDataTransaction);
-    oldData.push(newDataTransaction);
-    setDataTransaction(oldData);
-    console.table(dataTransaction);
-    emptyAddTransaction();
-    handleCloseModal();
+  const onHandlingSubmitAddTransaction = (data) => {
+    // if (data["productName-0"] === undefined) {
+    //   onErrorSubmitAddTransction("There is not have list product");
+    //   return;
+    // }
+    console.log(JSON.parse(getValues("productToBuy.0.product")).unit);
+    const parseCustomer = JSON.parse(data.customer);
+    console.table(parseCustomer);
+    // const oldData = [...dataTransaction];
+    // const transactionId =
+    //   dataTransaction[dataTransaction.length - 1].transactionID + 1;
+    // const timestamp = getDateTimeNow();
+    // const newDataTransaction = {
+    //   transactionId: transactionId,
+    //   ...customerSelected,
+    //   productToBuy: listProduct,
+    //   sum,
+    //   timestamp,
+    // };
+    // // console.log(newDataTransaction),
+    // rawDataTransaction.push(newDataTransaction);
+    // oldData.push(newDataTransaction);
+    // setDataTransaction(oldData);
+    // console.table(dataTransaction);
+    // emptyAddTransaction();
+    // handleCloseModal();
+  };
+
+  const onHandlingCloseErrorValidation = () => {
+    setAttrDialogValidation({
+      open: false,
+      content: {},
+      handling: null,
+    });
+  };
+
+  const onErrorSubmitAddTransction = (error) => {
+    console.log("Validation Errors:", error);
+    setAttrDialogValidation({
+      open: true,
+      content: VALIDATION_ERROR_ADD,
+      handling: () => onHandlingCloseErrorValidation(),
+    });
   };
 
   const onHandleUploadFile = (e) => {
@@ -350,7 +414,7 @@ const Transaction = () => {
       if (Array.isArray(oldData)) {
         if (idItem >= 0 && idItem < oldData.length) {
           oldData.splice(idItem, 1);
-          TRANSACTION.splice(idItem, 1);
+          rawDataTransaction.splice(idItem, 1);
 
           // console.log("This old Data after delete:");
           // console.table(oldData);
@@ -393,7 +457,7 @@ const Transaction = () => {
     // console.log("This Customer data before delete:");
     // console.log(CUSTOMERS[indexItem]);
 
-    TRANSACTION.splice(indexItem, 1, valueUpdateTransaction);
+    rawDataTransaction.splice(indexItem, 1, valueUpdateTransaction);
     tempDataCust.splice(indexItem, 1, valueUpdateTransaction);
     // console.log("This data Customer after update:");
     // console.log(dataCustomer[indexItem]);
@@ -523,6 +587,7 @@ const Transaction = () => {
   };
 
   const onHandleDataCustomer = (e) => {
+    console.log(getValues());
     const value = e.target.value;
 
     if (value != "") {
@@ -540,6 +605,7 @@ const Transaction = () => {
   };
 
   const onHandleDataProduct = (e) => {
+    console.log(getValues(`productToBuy.0.product`));
     const value = JSON.parse(e.target.value);
     console.log(value);
     const { indexList, ...dataProduct } = value;
@@ -602,6 +668,13 @@ const Transaction = () => {
     const oldData = [...listProduct];
     oldData.pop();
     setListProduct(oldData);
+  };
+
+  const getDataFormArray = (index, key) => {
+    if (key) {
+      return JSON.parse(getValues(`productToBuy.${index}.product`))[key];
+    }
+    return getValues(`productToBuy.${index}.product`);
   };
 
   return (
@@ -699,7 +772,7 @@ const Transaction = () => {
           </header>
           <hr />
           <Tabs
-            value={value}
+            value={valueTab}
             onChange={handleChange}
             aria-label="basic tabs for add data"
             sx={CSSPROPERTYTAB}
@@ -707,33 +780,41 @@ const Transaction = () => {
             <Tab label="One Data" value="0" />
             <Tab label="Bulk Data" value="1" />
           </Tabs>
-          <TabPanel index="0" value={value} key="0">
+          <TabPanel index="0" value={valueTab} key="0">
             <h1 className="text-xl text-white font-sans font-semibold my-3">
               Data Pelanggan
             </h1>
             <DividerHorizontal />
             <div className="grid grid-cols-2 grid-flow-row gap-3">
-              <div className="flex items-center space-x-2">
-                <span className="text-white w-1/4">Nama</span>
-                <select
-                  type="text"
-                  name="customerName"
-                  id="customerName"
-                  className="ms-1 form-input rounded-md text-sans bg-slate-300
+              <div className="grid grid-cols-1">
+                <div className="flex items-center space-x-2">
+                  <span className="text-white w-1/4">Nama</span>
+                  <select
+                    type="text"
+                    name="customerName"
+                    id="customerName"
+                    className="ms-1 form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-3/4"
-                  onChange={onHandleDataCustomer}
-                >
-                  <option key="value-kosong" value={null}></option>
-                  {CUSTOMERS.length > 0 &&
-                    CUSTOMERS.map((customer, index) => (
-                      <option
-                        key={`customer-${index + 1}`}
-                        value={JSON.stringify(customer)}
-                      >
-                        {customer.name}
-                      </option>
-                    ))}
-                </select>
+                    // onChange={(console.log(getValues()))}
+                    {...register("customer", {
+                      required: "Mohon pilih pelanggan terlebih dahulu",
+                    })}
+                  >
+                    <option key="value-kosong" value={""}>
+                      Mohon pilih salah satu pelanggan berikut
+                    </option>
+                    {CUSTOMERS.length > 0 &&
+                      CUSTOMERS.map((customer, index) => (
+                        <option
+                          key={`customer-${index + 1}`}
+                          value={JSON.stringify(customer)}
+                        >
+                          {customer.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <p className={VALIDATIONRULE}>{errors.customer?.message}</p>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-white w-1/4">e-mail</span>
@@ -744,7 +825,7 @@ const Transaction = () => {
                   className="ms-1 form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-3/4
                   overflow-x-auto"
-                  value={customerSelected.email}
+                  value={dataCustomer ? JSON.parse(dataCustomer)?.email : ""}
                   readOnly
                 />
               </div>
@@ -756,8 +837,10 @@ const Transaction = () => {
                   id="custType"
                   className="ms-1 form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-3/4"
-                  value={customerSelected.customerType}
-                  disabled
+                  value={
+                    dataCustomer ? JSON.parse(dataCustomer)?.customerType : ""
+                  }
+                  readOnly
                 />
               </div>
 
@@ -769,8 +852,8 @@ const Transaction = () => {
                   id="phone"
                   className="ms-1 form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-3/4"
-                  value={customerSelected.phone}
-                  disabled
+                  value={dataCustomer ? JSON.parse(dataCustomer)?.phone : ""}
+                  readOnly
                 />
               </div>
               <span className="text-white inline-block col-span-2">
@@ -782,8 +865,8 @@ const Transaction = () => {
                 id="address"
                 className="my-1 form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-full h-24 col-span-2"
-                value={customerSelected.address}
-                disabled
+                value={dataCustomer ? JSON.parse(dataCustomer)?.address : ""}
+                readOnly
               />
             </div>
             <h1 className="text-xl text-white font-sans font-semibold my-3">
@@ -801,98 +884,145 @@ const Transaction = () => {
                 </tr>
               </thead>
               <tbody className="text-center border border-black">
-                {listProduct.length > 0 ? (
+                {fields?.length > 0 ? (
                   <>
-                    {listProduct.map((barang, indexList) => (
-                      <tr>
-                        <td>{indexList + 1}</td>
-                        <td>
-                          <select
-                            type="text"
-                            name="productName"
-                            id="productName"
-                            className="ms-1 form-input rounded-md text-sans bg-slate-300
+                    {fields.map((barang, indexList) => {
+                      console.log(
+                        dataProductToBuy?.[indexList]?.product,
+                        `On index list ${indexList}`
+                      );
+                      const selectedProduct = dataProductToBuy?.[indexList]
+                        ?.product
+                        ? JSON.parse(dataProductToBuy?.[indexList]?.product)
+                        : null;
+                      return (
+                        <tr key={barang.id}>
+                          <td>{indexList + 1}</td>
+                          <td>
+                            <select
+                              type="text"
+                              name="productName"
+                              id="productName"
+                              className="ms-1 form-input rounded-md text-sans bg-slate-300
                     border-transparent focus:border-white-500 focus:bg-white focus:ring w-3/4 text-black"
-                            onChange={onHandleDataProduct}
-                            // Todo List make sure ketika di close modal nya masih ada
-                          >
-                            <option
-                              key="value-kosong"
-                              value={JSON.stringify({
-                                ...productNull,
-                                indexList,
+                              onChange={onHandleDataProduct}
+                              // Todo List make sure ketika di close modal nya masih ada
+                              {...register(
+                                `productToBuy.${indexList}.product`,
+                                {
+                                  required:
+                                    "Mohon pilih produk terlebih dahulu",
+                                }
+                              )}
+                            >
+                              <option key="value-kosong" value={""}></option>
+                              {PRODUCTS.length > 0 &&
+                                PRODUCTS.map((product, indexProduct) => (
+                                  <option
+                                    key={`product-${indexProduct + 1}`}
+                                    value={JSON.stringify({
+                                      ...product,
+                                    })}
+                                  >
+                                    {product.productName}
+                                  </option>
+                                ))}
+                            </select>
+                            <p className={VALIDATIONRULE}>
+                              {
+                                errors?.productToBuy?.[indexList]?.product
+                                  ?.message
+                              }
+                            </p>
+                          </td>
+                          <td>{selectedProduct?.unit || ""}</td>
+                          <td>
+                            {selectedProduct?.harga &&
+                              changeCurrencyForm(selectedProduct?.harga)}
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              className="w-1/2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                              placeholder="0"
+                              {...register(`productToBuy.${indexList}.qty`, {
+                                required:
+                                  "Mohon isi jumlah quantitas yang dibeli pelanggan",
+                                min: {
+                                  value: 0,
+                                  message:
+                                    "Mohon isi jumlah quantitas yang dibeli pelanggan lebih dari 1",
+                                },
+                                onChange: () => {
+                                  const harga = selectedProduct?.harga;
+                                  let total =
+                                    harga * dataProductToBuy[indexList]?.qty;
+                                  setValue(
+                                    `productToBuy.${indexList}.total`,
+                                    total
+                                  );
+                                  const calculate = calculateTotal(
+                                    dataProductToBuy,
+                                    "total"
+                                  );
+                                  setSum(calculate);
+                                },
                               })}
-                            ></option>
-                            {PRODUCTS.length > 0 &&
-                              PRODUCTS.map((product, indexProduct) => (
-                                <option
-                                  key={`product-${indexProduct + 1}`}
-                                  value={JSON.stringify({
-                                    ...product,
-                                    indexList,
-                                  })}
-                                >
-                                  {product.productName}
-                                </option>
-                              ))}
-                          </select>
-                        </td>
-                        <td>{barang.unit}</td>
-                        <td>
-                          {typeof barang.harga === "number" &&
-                            changeCurrencyForm(barang.harga)}
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            className="w-1/2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                            placeholder="0"
-                            onChange={(e) =>
-                              onHandleQtyProduct(
-                                indexList,
-                                Number(e.target.value)
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="px-5">
-                          {typeof barang.harga === "number" &&
-                            changeCurrencyForm(barang.total)}
-                        </td>
-                      </tr>
-                    ))}{" "}
+                            />
+                            <p className={VALIDATIONRULE + " text-left"}>
+                              {errors?.productToBuy?.[indexList]?.qty?.message}
+                            </p>
+                          </td>
+                          <td className="px-5">
+                            {dataProductToBuy[indexList]?.total &&
+                            typeof dataProductToBuy[indexList]?.total ==
+                              "number"
+                              ? changeCurrencyForm(
+                                  dataProductToBuy[indexList].total
+                                )
+                              : ""}
+                          </td>
+
+                          <td>
+                            <button
+                              className="rounded-xl bg-red-600 p-1 hover:bg-red-300 text-white font-bold h-12 my-5 me-5 ms-2 w-32 hover:cursor-pointer"
+                              onClick={() => {
+                                remove(indexList);
+                                setSum(
+                                  reduceNumber(
+                                    sum,
+                                    dataProductToBuy[indexList].total
+                                  )
+                                );
+                              }}
+                            >
+                              &times; Hapus
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                     <tr>
                       <td colSpan={5} className="text-right font-bold pe-3">
-                        {" "}
                         Total Transaksi
                       </td>
                       <td className="text-center font-bold">
-                        {changeCurrencyForm(sum)}
+                        {typeof sum == "number" && changeCurrenc(sum)}
                       </td>
                     </tr>
                   </>
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center text-xl">
-                      Belum ada data product, Mohon tambahkan dengan klik{" "}
+                    <td colSpan="7" className="text-center text-xl">
+                      Belum ada data product, Mohon tambahkan dengan klik
                       <b>+ Tambahkan</b>
                     </td>
                   </tr>
                 )}
                 <tr>
-                  <td colSpan="6">
-                    <button
-                      className={ADDBUTTON}
-                      onClick={onHandlingAddProduct}
-                    >
+                  <td colSpan="7">
+                    <button className={ADDBUTTON} onClick={() => append()}>
                       + Tambahkan
-                    </button>
-
-                    <button
-                      className="rounded-xl bg-red-600 p-1 hover:bg-red-300 text-white font-bold h-12 my-5 me-5 ms-2 w-32 hover:cursor-pointer"
-                      onClick={onHandlingDeleteProduct}
-                    >
-                      &times; Hapus
                     </button>
                   </td>
                 </tr>
@@ -900,12 +1030,15 @@ const Transaction = () => {
             </table>
             <button
               className="border mt-3 py-3 px-5 rounded-xl text-sans bg-slate-300"
-              onClick={onHandlingSubmitAddTransaction}
+              onClick={handleSubmit(
+                onHandlingSubmitAddTransaction,
+                onErrorSubmitAddTransction
+              )}
             >
               Submit
             </button>
           </TabPanel>
-          <TabPanel index="1" value={value} key="0">
+          <TabPanel index="1" value={valueTab} key="0">
             <header className="flex justify-end">
               <button
                 className="rounded-xl bg-green-600 text-white text-xs font-semibold h-12 me-1 ms-2 w-20 hover:cursor-pointer"
@@ -1020,7 +1153,7 @@ const Transaction = () => {
           <header className="flex justify-between mb-2 items-center">
             <h2 className="text-black text-2xl font-bold font-sans">
               {`Transaction Data ${
-                dataTransaction.length > 0 &&
+                dataTransaction?.length > 0 &&
                 dataTransaction[dataView.indexTransaction].transactionID
               }`}
             </h2>
@@ -1041,7 +1174,7 @@ const Transaction = () => {
                 </td>
                 <td>
                   <span className="text-black block">
-                    : {dataTransaction[dataView.indexTransaction].name}
+                    : {dataTransaction[dataView.indexTransaction]?.name}
                   </span>
                 </td>
               </tr>
@@ -1051,7 +1184,7 @@ const Transaction = () => {
                 </td>
                 <td>
                   <span className="text-black block">
-                    : {dataTransaction[dataView.indexTransaction].address}
+                    : {dataTransaction[dataView.indexTransaction]?.address}
                   </span>
                 </td>
               </tr>
@@ -1061,7 +1194,7 @@ const Transaction = () => {
                 </td>
                 <td>
                   <span className="text-black block">
-                    : {dataTransaction[dataView.indexTransaction].email}
+                    : {dataTransaction[dataView.indexTransaction]?.email}
                   </span>
                 </td>
               </tr>
@@ -1073,7 +1206,7 @@ const Transaction = () => {
                 </td>
                 <td>
                   <span className="text-black block">
-                    : {dataTransaction[dataView.indexTransaction].phone}
+                    : {dataTransaction[dataView.indexTransaction]?.phone}
                   </span>
                 </td>
               </tr>
@@ -1081,20 +1214,20 @@ const Transaction = () => {
             <table className="table-auto bg-white my-5 text-black overflow-y-auto">
               <thead className="border border-black">
                 <tr className="text-base font-sans">
-                  {FIELDS_NAME_PRODUCT_OF_TRANSACTION.map((field, index) => (
+                  {FIELDS_NAME_PRODUCT_OF_TRANSACTION.map((column, index) => (
                     <th key={index} className="px-3 text">
-                      {field}
+                      {column}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody className="text-center border border-black">
-                {dataTransaction[dataView.indexTransaction].productToBuy
+                {dataTransaction[dataView.indexTransaction]?.productToBuy
                   .length > 0 ? (
                   <>
                     {dataTransaction[
                       dataView.indexTransaction
-                    ].productToBuy.map((product, index) => (
+                    ].productToBuy?.map((product, index) => (
                       <tr key={index} className="border border-black">
                         <td className="px-3">{index + 1}</td>
                         <td className="px-3">{product.productName}</td>
@@ -1115,7 +1248,7 @@ const Transaction = () => {
                       </td>
                       <td className="text-center font-bold">
                         {changeCurrencyForm(
-                          dataTransaction[dataView.indexTransaction].sum
+                          dataTransaction[dataView.indexTransaction]?.sum
                         )}
                       </td>
                     </tr>
@@ -1140,6 +1273,11 @@ const Transaction = () => {
           </DialogContentText>
         </DialogContent>
       </Dialog>
+      <DialogValidation
+        open={attrDialogValidation.open}
+        content={attrDialogValidation.content}
+        handleButton={attrDialogValidation.handling}
+      />
     </div>
   );
 };

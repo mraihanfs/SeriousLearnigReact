@@ -772,7 +772,7 @@ export const CUSTOMERS = [
   }
 ];
 
-export const TRANSACTION = [
+  export const TRANSACTION = [
   {
     "transactionID": 1,
     "customerID": 20,

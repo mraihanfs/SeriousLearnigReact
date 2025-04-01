@@ -20,6 +20,7 @@ import {
   DialogContentText,
 } from "@mui/material";
 import TabPanel from "../components/TabPanel";
+import DialogValidation from "../components/DialogValidation";
 
 import { CUSTOMERS } from "../constants/DataMock";
 import { FIELDS_NAME_CUSTOMER } from "../constants/FieldName";
@@ -31,8 +32,15 @@ import {
   UPDATEBUTTON,
   DATANOTFOUND,
   WORDINGDATATABLE,
+  VALIDATIONRULE,
 } from "../constants/PropertyCss";
-import { CUSTOMER_TYPES } from "../constants/DataInput";
+import {
+  CUSTOMER_TYPES,
+  VALIDATION_ERROR_ADD,
+  VALIDATION_ERROR_UPDATE,
+} from "../constants/DataInput";
+
+import { useForm } from "react-hook-form";
 
 // const dataNullCustomer = {
 //   customerID: null,
@@ -44,16 +52,24 @@ import { CUSTOMER_TYPES } from "../constants/DataInput";
 // };
 
 const Customer = () => {
+  const formAdd = useForm({
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
+
+  const formUpdate = useForm({
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
+
   const [dataCustomer, setDataCustomer] = useState(CUSTOMERS);
   const [dataShow, setDataShow] = useState([]);
   const [page, setPage] = useState(0);
   const [openModal, setOpenModal] = useState(0);
-  const [value, setValue] = useState("0");
+  const [valueTab, setValueTab] = useState("0");
   const uploadBulkFile = useRef(null);
 
-  const [valueAddCustomer, setValueAddCustomer] = useState({
-    customerType: "Restoran",
-  });
+  const [valueAddCustomer, setValueAddCustomer] = useState({});
 
   const [valueUpdateCustomer, setValueUpdateCustomer] = useState({
     id: "",
@@ -77,6 +93,12 @@ const Customer = () => {
   const [dataUpdate, setDataUpdate] = useState({
     openUpdate: false,
     indexCustomer: 0,
+  });
+
+  const [attrDialogValidation, setAttrDialogValidation] = useState({
+    open: false,
+    content: {},
+    handling: null,
   });
 
   useEffect(() => {
@@ -140,6 +162,7 @@ const Customer = () => {
   };
   const handleCloseModal = () => {
     setOpenModal(false);
+    formAdd.reset();
   };
 
   const handleOpenDialogDelete = (e) => {
@@ -166,21 +189,32 @@ const Customer = () => {
     setDataDelete(newDataDelete);
   };
 
+  const setAllDataUpdate = ( dataCustomer ) => {
+    formUpdate.setValue("customerId", dataCustomer.customerId);
+    formUpdate.setValue("name", dataCustomer.name);
+    formUpdate.setValue("email", dataCustomer.email);
+    formUpdate.setValue("phone", dataCustomer.phone);
+    formUpdate.setValue("address", dataCustomer.address);
+    formUpdate.setValue("customerType", dataCustomer.customerType);
+  };
+
   const handleOpenDialogUpdate = (e) => {
     e.preventDefault();
     // console.log("Data delete before change: ", dataDelete);
     console.log(e.target.id);
     let [_, indexCustomer] = e.target.id.split(".");
     indexCustomer = +indexCustomer;
-    const attributeOldData = dataCustomer[indexCustomer];
+    // const { name, email, phone, address, customerType } =
+    //   dataCustomer[indexCustomer];
     const newDataUpdate = {
       openUpdate: true,
       indexCustomer: indexCustomer,
     };
     console.log("Data Update after change: ", newDataUpdate);
     setDataUpdate(newDataUpdate);
-    console.log("Data attribute for edit: ", attributeOldData);
-    setValueUpdateCustomer(attributeOldData);
+    // console.log("Data attribute for edit: ", attributeOldData);
+    // setValueUpdateCustomer(attributeOldData);
+    setAllDataUpdate({ ...dataCustomer[indexCustomer] });
   };
 
   const handleCloseDialogUpdate = () => {
@@ -189,10 +223,11 @@ const Customer = () => {
       indexCustomer: 0,
     };
     setDataUpdate(newDataUpdate);
+    formUpdate.reset();
   };
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setValueTab(newValue);
   };
 
   const onHandleInputChange = (e) => {
@@ -200,18 +235,32 @@ const Customer = () => {
     setValueAddCustomer({ ...valueAddCustomer, [name]: value });
   };
 
-  const onHandlingSubmitAddCustomer = (e) => {
-    e.preventDefault();
-    const oldData = [...dataCustomer]
+  const onHandlingSubmitAddCustomer = (data) => {
+    console.log(data);
+    const oldData = [...dataCustomer];
     const customerId = dataCustomer[dataCustomer.length - 1].customerId + 1;
-    CUSTOMERS.push({ customerId, ...valueAddCustomer });
-    oldData.push({ customerId, ...valueAddCustomer });
+    CUSTOMERS.push({ customerId, ...data });
+    oldData.push({ customerId, ...data });
     setDataCustomer(oldData);
-    setValueAddCustomer({
-      customerType: "Restoran",
-    });
     // console.table(dataCustomer);
     handleCloseModal();
+  };
+
+  const onHandlingCloseErrorValidation = () => {
+    setAttrDialogValidation({
+      open: false,
+      content: {},
+      handling: null,
+    });
+  };
+
+  const onErrorSubmitAddCustomer = (error) => {
+    console.log("Validation Errors:", error);
+    setAttrDialogValidation({
+      open: true,
+      content: VALIDATION_ERROR_ADD,
+      handling: () => onHandlingCloseErrorValidation(),
+    });
   };
 
   const onHandleUploadFile = (e) => {
@@ -327,17 +376,18 @@ const Customer = () => {
     setValueUpdateCustomer({ ...valueUpdateCustomer, [name]: value });
   };
 
-  const onUpdateData = (e) => {
-    e.preventDefault();
+  const onUpdateData = (data) => {
+    console.log(data);
     let indexItem = dataUpdate.indexCustomer;
+
     const tempDataCust = [...dataCustomer];
     // console.log("This data Customer before update:");
     // console.log(dataCustomer[indexItem]);
     // console.log("This Customer data before delete:");
     // console.log(CUSTOMERS[indexItem]);
 
-    CUSTOMERS.splice(indexItem, 1, valueUpdateCustomer);
-    tempDataCust.splice(indexItem, 1, valueUpdateCustomer);
+    CUSTOMERS.splice(indexItem, 1, data);
+    tempDataCust.splice(indexItem, 1, data);
     // console.log("This data Customer after update:");
     // console.log(dataCustomer[indexItem]);
     // console.log("This Customer data after delete:");
@@ -346,6 +396,15 @@ const Customer = () => {
     setDataUpdate({
       openUpdate: false,
       indexCustomer: 0,
+    });
+  };
+
+  const onErrorSubmitUpdateCustomer = (error) => {
+    console.log("Validation Errors:", error);
+    setAttrDialogValidation({
+      open: true,
+      content: VALIDATION_ERROR_UPDATE,
+      handling: () => onHandlingCloseErrorValidation(),
     });
   };
 
@@ -483,7 +542,7 @@ const Customer = () => {
           </header>
           <hr />
           <Tabs
-            value={value}
+            value={valueTab}
             onChange={handleChange}
             aria-label="basic tabs for add data"
             sx={CSSPROPERTYTAB}
@@ -491,7 +550,7 @@ const Customer = () => {
             <Tab label="One Data" value="0" />
             <Tab label="Bulk Data" value="1" />
           </Tabs>
-          <TabPanel index="0" value={value} key="0">
+          <TabPanel index="0" value={valueTab} key="0">
             <label className="block">
               <span className="text-white block">Nama Customer</span>
               <input
@@ -501,7 +560,13 @@ const Customer = () => {
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
                 onChange={onHandleInputChange}
+                {...formAdd.register("name", {
+                  required: "Mohon isi nama pelanggan",
+                })}
               />
+              <p className={VALIDATIONRULE}>
+                {formAdd.formState.errors.name?.message}
+              </p>
             </label>
             <label className="block">
               <span className="text-white block">Alamat Pelanggan</span>
@@ -511,8 +576,13 @@ const Customer = () => {
                 id="address"
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
-                onChange={onHandleInputChange}
+                {...formAdd.register("address", {
+                  required: "Mohon isi alamat pelanggan",
+                })}
               />
+              <p className={VALIDATIONRULE}>
+                {formAdd.formState.errors.address?.message}
+              </p>
             </label>
 
             <label className="block">
@@ -524,7 +594,13 @@ const Customer = () => {
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
                 onChange={onHandleInputChange}
+                {...formAdd.register("email", {
+                  required: "Mohon bantuannya untuk mengisi email customer",
+                })}
               />
+              <p className={VALIDATIONRULE}>
+                {formAdd.formState.errors.email?.message}
+              </p>
             </label>
             <div className="flex w-full my-3">
               <label className="inline w-1/2 me-3">
@@ -536,7 +612,11 @@ const Customer = () => {
                   className="mt-1 block form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-full"
                   onChange={onHandleInputChange}
+                  {...formAdd.register("customerType", {
+                    required: "Mohon isi jenis pelanggan",
+                  })}
                 >
+                  <option value="">Pilih Jenis Pelanggan</option>
                   {CUSTOMER_TYPES.length > 0 &&
                     CUSTOMER_TYPES.map((customerType, index) => (
                       <option key={index} value={customerType}>
@@ -544,6 +624,9 @@ const Customer = () => {
                       </option>
                     ))}
                 </select>
+                <p className={VALIDATIONRULE}>
+                  {formAdd.formState.errors.customerType?.message}
+                </p>
               </label>
               <label className="inline w-1/2">
                 <span className="text-white block">No. HP Pelanggan</span>
@@ -554,18 +637,37 @@ const Customer = () => {
                   className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
                   onChange={onHandleInputChange}
+                  {...formAdd.register("phone", {
+                    required: "Mohon isi no. hp pelanggan",
+                    minLength: {
+                      value: 10,
+                      message:
+                        "Mohon isi no. hp pelanggan dengan minimal 10 digit",
+                    },
+                    maxLength: {
+                      value: 15,
+                      message:
+                        "Mohon isi no. hp pelanggan dengan maksimal 15 digit",
+                    },
+                  })}
                 />
+                <p className={VALIDATIONRULE}>
+                  {formAdd.formState.errors.phone?.message}
+                </p>
               </label>
             </div>
 
             <button
               className="border mt-3 py-3 px-5 rounded-xl text-sans bg-slate-300"
-              onClick={onHandlingSubmitAddCustomer}
+              onClick={formAdd.handleSubmit(
+                onHandlingSubmitAddCustomer,
+                onErrorSubmitAddCustomer
+              )}
             >
               Submit
             </button>
           </TabPanel>
-          <TabPanel index="1" value={value} key="0">
+          <TabPanel index="1" value={valueTab} key="0">
             <header className="flex justify-end">
               <button
                 className="rounded-xl bg-green-600 text-white text-xs font-semibold h-12 me-1 ms-2 w-20 hover:cursor-pointer"
@@ -728,8 +830,13 @@ const Customer = () => {
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
                 onChange={onHandleInputChangeUpdate}
-                value={valueUpdateCustomer.name}
+                {...formUpdate.register("name", {
+                  required: "Mohon untuk nama pelanggan di isi",
+                })}
               />
+              <p className={VALIDATIONRULE}>
+                {formUpdate.formState.errors.name?.message}
+              </p>
             </label>
             <label className="block">
               <span className="text-black block">Alamat Pelanggan</span>
@@ -740,8 +847,13 @@ const Customer = () => {
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
                 onChange={onHandleInputChangeUpdate}
-                value={valueUpdateCustomer.address}
+                {...formUpdate.register("address", {
+                  required: "Mohon untuk alamat pelanggan di isi",
+                })}
               />
+              <p className={VALIDATIONRULE}>
+                {formUpdate.formState.errors.address?.message}
+              </p>
             </label>
             <label className="block">
               <span className="text-black block">E-mail Pelanggan</span>
@@ -752,8 +864,13 @@ const Customer = () => {
                 className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
                 onChange={onHandleInputChangeUpdate}
-                value={valueUpdateCustomer.email}
+                {...formUpdate.register("email", {
+                  required: "Mohon untuk email pelanggan di isi",
+                })}
               />
+              <p className={VALIDATIONRULE}>
+                {formUpdate.formState.errors.email?.message}
+              </p>
             </label>
             <div className="flex w-full my-3">
               <label className="inline w-1/2 me-3">
@@ -765,8 +882,13 @@ const Customer = () => {
                   className="mt-1 block form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-full"
                   onChange={onHandleInputChangeUpdate}
-                  value={valueUpdateCustomer.customerType}
+                  {...formUpdate.register("customerType", {
+                    required: "Mohon untuk tipe pelanggan di isi",
+                  })}
                 >
+                  <option key="null object" value={""}>
+                    Mohon memilih tipe pelanggan yang disediakan
+                  </option>
                   {CUSTOMER_TYPES.length > 0 &&
                     CUSTOMER_TYPES.map((unit, index) => (
                       <option key={index} value={unit}>
@@ -774,6 +896,9 @@ const Customer = () => {
                       </option>
                     ))}
                 </select>
+                <p className={VALIDATIONRULE}>
+                  {formUpdate.formState.errors.customerType?.message}
+                </p>
               </label>
               <label className="inline w-1/2">
                 <span className="text-black block">No. HP Pelanggan</span>
@@ -784,14 +909,35 @@ const Customer = () => {
                   className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring"
                   onChange={onHandleInputChangeUpdate}
-                  value={valueUpdateCustomer.phone}
+                  {...formUpdate.register("phone", {
+                    required: "Mohon untuk nomor Hp. pelanggan di isi",
+                    minLength: {
+                      value: 10,
+                      message:
+                        "Mohon isi no. hp pelanggan dengan minimal 10 digit",
+                    },
+                    maxLength: {
+                      value: 15,
+                      message:
+                        "Mohon isi no. hp pelanggan dengan maksimal 15 digit",
+                    },
+                  })}
                 />
+                <p className={VALIDATIONRULE}>
+                  {formUpdate.formState.errors.phone?.message}
+                </p>
               </label>
             </div>
           </DialogContentText>
         </DialogContent>
         <DialogActions className="px-3">
-          <button onClick={onUpdateData} className={UPDATEBUTTON}>
+          <button
+            onClick={formUpdate.handleSubmit(
+              onUpdateData,
+              onErrorSubmitUpdateCustomer
+            )}
+            className={UPDATEBUTTON}
+          >
             Update
           </button>
           <button
@@ -803,6 +949,11 @@ const Customer = () => {
           </button>
         </DialogActions>
       </Dialog>
+      <DialogValidation
+        open={attrDialogValidation.open}
+        content={attrDialogValidation.content}
+        handleButton={attrDialogValidation.handling}
+      />
     </div>
   );
 };

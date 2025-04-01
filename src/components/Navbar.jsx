@@ -4,7 +4,7 @@ import { MdOutlineStore } from "react-icons/md";
 import { MdOutlinePerson } from "react-icons/md";
 import { MdOutlineInsertChart } from "react-icons/md";
 import { MdSearch } from "react-icons/md";
-
+import DashboardIcon from "../assets/dashboardicon.png";
 
 const Navbar = ({ navShow, onRenderData }) => {
   const sendData = (data) => {
@@ -15,15 +15,15 @@ const Navbar = ({ navShow, onRenderData }) => {
     <nav
       className={`flex flex-col items-start h-full border rounded-xl bg-slate-600 text-white pt-3 ps-3 m-1 ${
         navShow ? "w-48" : "w-16"
-      } sticky top-0 left-0 overflow-y-auto`} 
+      } sticky top-0 left-0 overflow-y-auto`}
     >
       <ul>
         <li
-          className="flex border border-white hover:cursor-pointer"
+          className="flex hover:cursor-pointer"
           key="dashboard"
           onClick={() => sendData("dashboard")}
         >
-          <MdHome className="text-3xl mx-1" />
+          <img className="text-3xl mx-1" src={DashboardIcon} />
           <h2 className={navShow ? "" : "hidden"}>Home</h2>
         </li>
         <li

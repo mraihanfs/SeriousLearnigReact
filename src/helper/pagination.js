@@ -1,5 +1,6 @@
 const seperateData = (data) => {
   const result = [];
+  // console.log (data)
   if (!(data.length>0)){
     return result;
   }

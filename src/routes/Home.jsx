@@ -4,6 +4,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import AccountProfile from "../components/AccountProfile";
 import Navbar from "../components/Navbar";
+import LoadingScreen from "../components/LoadingScreen";
+
+import transactionService from "../services/transactionService";
+import LoadingSection from "../components/LoadingSection";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 const Customer = React.lazy(() => import("./Customer"));
@@ -53,13 +57,7 @@ const Home = () => {
       </header>
       <div className="flex flex-1">
         <Navbar navShow={isNavShow} onRenderData={changeRenderContent} />
-        <Suspense
-          fallback={
-            <div className="h-screen w-screen flex flex-col items-center justify-center">
-              <CircularProgress />
-            </div>
-          }
-        >
+        <Suspense fallback={<LoadingSection />}>
           <div className=" flex-1 w-full h-full m-1">{renderContent()}</div>
         </Suspense>
       </div>
