@@ -41,16 +41,26 @@ import {
 } from "../constants/DataInput";
 import { changeCurrencyForm } from "../helper/convert";
 import { useForm } from "react-hook-form";
-import { responseProduct } from "../helper/inquiryData";
+import { responseBrand, responseProduct } from "../helper/inquiryData";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { productSchema } from "../validationSchema/formValidation";
+import { ACTIVE } from "../constants/DataConstant";
+
+import LoadingScreen from "../components/LoadingScreen";
+import productService from "../services/productService";
 
 const Product = () => {
-  const rawDataProduct = responseProduct.read()
+  const rawDataProduct = responseProduct.read();
+  console.log(rawDataProduct);
+  
+  const dataBrand = responseBrand.read();
   const [dataProduct, setDataProduct] = useState(rawDataProduct);
   const [dataShow, setDataShow] = useState([]);
   const [page, setPage] = useState(0);
   const [openModal, setOpenModal] = useState(0);
   const [valueTab, setValueTab] = useState("0");
   const uploadBulkFile = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [valueAddProduct, setValueAddProduct] = useState({});
 
@@ -64,11 +74,13 @@ const Product = () => {
   const formAdd = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
+    resolver: yupResolver(productSchema),
   });
 
   const formUpdate = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
+    resolver: yupResolver(productSchema),
   });
 
   const [valueAddBulkProduct, setValueAddBulkProduct] = useState([]);
@@ -101,7 +113,7 @@ const Product = () => {
     e.preventDefault();
     const searchQuery = e.target.value.toLowerCase();
     if (!searchQuery) {
-      setDataProduct(PRODUCTS);
+      setDataProduct(rawDataProduct);
       setPage(0);
     } else {
       const filteredProduct = dataProduct.filter(
@@ -183,10 +195,14 @@ const Product = () => {
   };
 
   const setAllDataUpdate = (dataProduct) => {
-    formUpdate.setValue("id", dataProduct.id);
+    formUpdate.setValue("productCode", dataProduct.productCode);
     formUpdate.setValue("productName", dataProduct.productName);
+    formUpdate.setValue("productAmount", dataProduct.amount);
+    formUpdate.setValue("brandId", dataProduct.brandId);
+    formUpdate.setValue("productDescription", dataProduct.description);
     formUpdate.setValue("unitOfMeasure", dataProduct.unitOfMeasure);
-    formUpdate.setValue("amount", dataProduct.amount);
+    formUpdate.setValue("quantity", dataProduct.quantity);
+    formUpdate.setValue("productImages", dataProduct.productImages);
   };
 
   const handleOpenDialogUpdate = (e) => {
@@ -229,21 +245,59 @@ const Product = () => {
   //   }
   // };
 
-  const onHandlingSubmitAddProduct = (data) => {
-    console.log(data);
-    const oldProduct = [...dataProduct];
-    const id = dataProduct[dataProduct.length - 1].id + 1;
-    PRODUCTS.push({ id, ...data });
-    oldProduct.push({ id, ...data });
-    setDataProduct(oldProduct);
-    handleCloseModal();
+  const onHandlingSubmitAddProduct = async (data) => {
+    const { productName } = data;
+    setIsLoading(true);
+    let productCodeLatest = Number.parseInt(
+      dataProduct[dataProduct.length - 1].productCode.slice(1)
+    );
+    const productCode = `${productName.at(0)}${productCodeLatest + 1}`;
+    const reqData = {
+      ...data,
+      productCode,
+    };
+    console.log(reqData);
+    try {
+      const resp = await productService.create(reqData);
+      console.log("Add Product Successfull", resp);
+      setIsLoading(false);
+      setAttrDialogValidation({
+        open: true,
+        content: resp.status.contents["en"],
+        handling: () => {
+          onHandlingCloseValidation();
+          handleCloseModal();
+        },
+      });
+    } catch (err) {
+      console.error(
+        "Add Product Failed",
+        err.response?.data?.responseKey || err.message
+      );
+      setIsLoading(false);
+      setAttrDialogValidation({
+        open: true,
+        content: err.response.data.status
+          ? err.response?.data?.status.contents["en"]
+          : VALIDATION_ERROR("Add Product"),
+        handling: () => onHandlingCloseValidation(),
+      });
+    }
+
+    // const oldProduct = [...dataProduct];
+    // const id = dataProduct[dataProduct.length - 1].id + 1;
+    // PRODUCTS.push({ id, ...data });
+    // oldProduct.push({ id, ...data });
+    // setDataProduct(oldProduct);
+    // handleCloseModal();
+    setIsLoading(false);
   };
 
-  const onHandlingCloseErrorValidation = () => {
+  const onHandlingCloseValidation = () => {
     setAttrDialogValidation({
       open: false,
-      content: {},
       handling: null,
+      content: {},
     });
   };
 
@@ -252,7 +306,7 @@ const Product = () => {
     setAttrDialogValidation({
       open: true,
       content: VALIDATION_ERROR_ADD,
-      handling: () => onHandlingCloseErrorValidation(),
+      handling: () => onHandlingCloseValidation(),
     });
   };
 
@@ -370,27 +424,39 @@ const Product = () => {
     }
   };
 
-  const onUpdateData = (data) => {
+  const onUpdateData = async (data) => {
     console.log(data);
-
-    let indexItem = dataUpdate.indexProduct;
-    const tempDataProd = [...dataProduct];
-    // console.log("This data product before update:");
-    // console.log(dataProduct[indexItem]);
-    // console.log("This product data before delete:");
-    // console.log(PRODUCTS[indexItem]);
-
-    PRODUCTS.splice(indexItem, 1, data);
-    tempDataProd.splice(indexItem, 1, data);
-    // console.log("This data product after update:");
-    // console.log(dataProduct[indexItem]);
-    // console.log("This product data after delete:");
-    // console.log(PRODUCTS[indexItem]);
-    setDataProduct(tempDataProd);
-    setDataUpdate({
-      openUpdate: false,
-      indexProduct: 0,
-    });
+    setIsLoading(true);
+    const reqData = {
+      ...data,
+    };
+    console.log(reqData);
+    try {
+      const resp = await productService.create(reqData);
+      console.log("Add Product Successfull", resp);
+      setIsLoading(false);
+      setAttrDialogValidation({
+        open: true,
+        content: resp.status.contents["en"],
+        handling: () => {
+          onHandlingCloseValidation();
+          handleCloseDialogUpdate();
+        },
+      });
+    } catch (err) {
+      console.error(
+        "Add Product Failed",
+        err.response?.data?.responseKey || err.message
+      );
+      setIsLoading(false);
+      setAttrDialogValidation({
+        open: true,
+        content: err.response.data.status
+          ? err.response?.data?.status.contents["en"]
+          : VALIDATION_ERROR("Update Product"),
+        handling: () => onHandlingCloseValidation(),
+      });
+    }
   };
 
   const onErrorSubmitUpdateProduct = (error) => {
@@ -398,7 +464,7 @@ const Product = () => {
     setAttrDialogValidation({
       open: true,
       content: VALIDATION_ERROR_UPDATE,
-      handling: () => onHandlingCloseErrorValidation(),
+      handling: () => onHandlingCloseValidation(),
     });
   };
 
@@ -457,32 +523,38 @@ const Product = () => {
         </thead>
         <tbody className="text-center border border-black">
           {dataShow.length > 0 ? (
-            dataShow[page].map((product, index) => (
-              <tr key={product.id} className="border border-black">
-                <td>{page * 10 + index + 1}</td>
-                <td>{product.productName}</td>
-                <td>{product.unitOfMeasure}</td>
-                <td>{changeCurrencyForm(product.amount)}</td>
-                <td>
-                  <button
-                    className={UPDATEBUTTON}
-                    id={"updateProduct." + (page * 10 + index)}
-                    onClick={handleOpenDialogUpdate}
-                  >
-                    Update
-                  </button>
-                </td>
-                <td>
-                  <button
-                    className={DELETEBUTTON}
-                    id={"deleteProduct." + (page * 10 + index)}
-                    onClick={handleOpenDialogDelete}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
+            dataShow[page].map((product, index) => {
+              if (ACTIVE === product.status)
+                return (
+                  <tr key={product.id} className="border border-black">
+                    <td>{page * 10 + index + 1}</td>
+                    <td>{product.productImages}</td>
+                    <td>{product.productName}</td>
+                    <td>{product.quantity}</td>
+                    <td>{product.unitOfMeasure}</td>
+                    <td>{changeCurrencyForm(product.amount)}</td>
+                    <td>{product.description}</td>
+                    <td>
+                      <button
+                        className={UPDATEBUTTON}
+                        id={"updateProduct." + (page * 10 + index)}
+                        onClick={handleOpenDialogUpdate}
+                      >
+                        Update
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        className={DELETEBUTTON}
+                        id={"deleteProduct." + (page * 10 + index)}
+                        onClick={handleOpenDialogDelete}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+            })
           ) : (
             <tr>
               <td colSpan="6" className={DATANOTFOUND}>
@@ -541,23 +613,82 @@ const Product = () => {
             <Tab label="Bulk Data" value="1" />
           </Tabs>
           <TabPanel index="0" value={valueTab} key="0">
-            <label className="block">
-              <span className="text-white block">Nama Produk</span>
-              <input
-                type="text"
-                name="productName"
-                id="productName"
-                className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
-                  border-transparent focus:border-white-500 focus:bg-white focus:ring"
-                // onChange={onHandleInputChange}
-                {...formAdd.register("productName", {
-                  required: "Nama Produk tidak boleh kosong",
-                })}
-              />
-              <p className={VALIDATIONRULE}>
-                {formAdd.formState.errors.productName?.message}
-              </p>
-            </label>
+            <div className="flex w-full my-3">
+              <label className="inline w-1/2 me-3">
+                <span className="text-white block">Nama Produk</span>
+                <input
+                  type="text"
+                  name="productName"
+                  id="productName"
+                  className="mt-1 block form-input rounded-md text-sans bg-slate-300
+                      border-transparent focus:border-white-500 focus:bg-white focus:ring
+                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  // onChange={onHandleInputChange}
+                  {...formAdd.register("productName", {
+                    required: "Mohon input harga produk",
+                  })}
+                />
+                <p className={VALIDATIONRULE}>
+                  {formAdd.formState.errors.productName?.message}
+                </p>
+              </label>
+              <label className="inline w-1/2">
+                <span className="text-white block">Jumlah Produk</span>
+                <input
+                  type="number"
+                  name="quantity"
+                  id="quantity"
+                  className="mt-1 block form-input rounded-md text-sans bg-slate-300
+                  border-transparent focus:border-white-500 focus:bg-white focus:ring
+                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  // onChange={onHandleInputChange}
+                  {...formAdd.register("quantity", {
+                    required: "Mohon input harga produk",
+                  })}
+                />
+                <p className={VALIDATIONRULE}>
+                  {formAdd.formState.errors.quantity?.message}
+                </p>
+              </label>
+            </div>
+            <div className="flex w-full my-3">
+              <label className="inline w-1/2 me-3">
+                <span className="text-white block">Image Url</span>
+                <input
+                  type="text"
+                  name="productImages"
+                  id="productImages"
+                  className="mt-1 block form-input rounded-md text-sans bg-slate-300
+                      border-transparent focus:border-white-500 focus:bg-white focus:ring
+                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  // onChange={onHandleInputChange}
+                  {...formAdd.register("productImages", {
+                    required: "Mohon input harga produk",
+                  })}
+                />
+                <p className={VALIDATIONRULE}>
+                  {formAdd.formState.errors.productImages?.message}
+                </p>
+              </label>
+              <label className="inline w-1/2">
+                <span className="text-white block">Harga Produk</span>
+                <input
+                  type="number"
+                  name="productAmount"
+                  id="productAmount"
+                  className="mt-1 block form-input rounded-md text-sans bg-slate-300
+                  border-transparent focus:border-white-500 focus:bg-white focus:ring
+                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  // onChange={onHandleInputChange}
+                  {...formAdd.register("productAmount", {
+                    required: "Mohon input harga produk",
+                  })}
+                />
+                <p className={VALIDATIONRULE}>
+                  {formAdd.formState.errors.productAmount?.message}
+                </p>
+              </label>
+            </div>
             <div className="flex w-full my-3">
               <label className="inline w-1/2 me-3">
                 <span className="text-white block">Unit Produk</span>
@@ -568,13 +699,7 @@ const Product = () => {
                   className="mt-1 block form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-full"
                   // onChange={onHandleInputChange}
-                  {...formAdd.register("unitOfMeasure", {
-                    required: "Mohon unit dapat di isi terlebih dahulu",
-                    // min: {
-                    //   value: 1,
-                    //   message: "Mohon unit dapat di isi terlebih dahulu",
-                    // },
-                  })}
+                  {...formAdd.register("unitOfMeasure")}
                 >
                   <option key="null object" value={""}>
                     Mohon memilih unit yang disediakan
@@ -591,23 +716,46 @@ const Product = () => {
                 </p>
               </label>
               <label className="inline w-1/2">
-                <span className="text-white block">Harga Produk</span>
-                <input
-                  type="number"
-                  name="amount"
-                  id="amount"
+                <span className="text-white block">Brand Produk</span>
+                <select
+                  type="text"
+                  name="brandId"
+                  id="brandId"
                   className="mt-1 block form-input rounded-md text-sans bg-slate-300
-                  border-transparent focus:border-white-500 focus:bg-white focus:ring
-                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  border-transparent focus:border-white-500 focus:bg-white focus:ring w-full"
                   // onChange={onHandleInputChange}
-                  {...formAdd.register("amount", {
-                    required: "Mohon input harga produk",
-                  })}
-                />
+                  {...formAdd.register("brandId")}
+                >
+                  <option key="null object" value={""}>
+                    Mohon memilih brand yang disediakan
+                  </option>
+                  {dataBrand.length > 0 &&
+                    dataBrand.map((brand, index) => (
+                      <option key={index} value={brand.brandId}>
+                        {brand.brandName}
+                      </option>
+                    ))}
+                </select>
                 <p className={VALIDATIONRULE}>
-                  {formAdd.formState.errors.amount?.message}
+                  {formAdd.formState.errors.brandId?.message}
                 </p>
               </label>
+            </div>
+            <div className="mt-5">
+              <span className="text-white inline-block col-span-2">
+                Deskripsi Product
+              </span>
+              <textarea
+                type="text"
+                name="productDescription"
+                id="productDescription"
+                className="my-1 form-input rounded-md text-sans bg-slate-300
+                               border-transparent focus:border-white-500 focus:bg-white focus:ring w-full h-24 col-span-2"
+                {...formAdd.register("productDescription")}
+              />
+              <p className={VALIDATIONRULE}>
+                {formAdd.formState.errors.productDescription?.message}
+              </p>
             </div>
 
             <button
@@ -672,7 +820,9 @@ const Product = () => {
                         <td className={WORDINGDATATABLE}>
                           {product.productName}
                         </td>
-                        <td className={WORDINGDATATABLE}>{product.unitOfMeasure}</td>
+                        <td className={WORDINGDATATABLE}>
+                          {product.unitOfMeasure}
+                        </td>
                         <td className={WORDINGDATATABLE}>
                           {changeCurrencyForm(product.amount)}
                         </td>
@@ -756,36 +906,89 @@ const Product = () => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            <label className="block">
-              <span className="text-black block">Nama Produk</span>
-              <input
-                type="text"
-                name="productName"
-                id="productName"
-                className="mt-1 block w-full form-input rounded-md text-sans bg-slate-300
-                  border-transparent focus:border-white-500 focus:bg-white focus:ring"
-                onChange={onHandleInputChangeUpdate}
-                {...formUpdate.register("productName", {
-                  required: "Nama Produk tidak boleh kosong",
-                })}
-              />
-              <p className={VALIDATIONRULE}>
-                {formUpdate.formState.errors.productName?.message}
-              </p>
-            </label>
             <div className="flex w-full my-3">
               <label className="inline w-1/2 me-3">
-                <span className="text-black block">Unit Produk</span>
+                <span className="text-white block">Nama Produk</span>
+                <input
+                  type="text"
+                  name="productName"
+                  id="productName"
+                  className="mt-1 block form-input rounded-md text-sans bg-slate-300
+                      border-transparent focus:border-white-500 focus:bg-white focus:ring
+                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  // onChange={onHandleInputChange}
+                  {...formUpdate.register("productName", {
+                    required: "Mohon input harga produk",
+                  })}
+                />
+                <p className={VALIDATIONRULE}>
+                  {formUpdate.formState.errors.productName?.message}
+                </p>
+              </label>
+              <label className="inline w-1/2">
+                <span className="text-white block">Jumlah Produk</span>
+                <input
+                  type="number"
+                  name="quantity"
+                  id="quantity"
+                  className="mt-1 block form-input rounded-md text-sans bg-slate-300
+                  border-transparent focus:border-white-500 focus:bg-white focus:ring
+                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  // onChange={onHandleInputChange}
+                  {...formUpdate.register("quantity", {
+                    required: "Mohon input harga produk",
+                  })}
+                />
+                <p className={VALIDATIONRULE}>
+                  {formUpdate.formState.errors.quantity?.message}
+                </p>
+              </label>
+            </div>
+            <div className="flex w-full my-3">
+              <label className="inline w-1/2 me-3">
+                <span className="text-white block">Image Url</span>
+                <input
+                  type="text"
+                  name="productImages"
+                  id="productImages"
+                  className="mt-1 block form-input rounded-md text-sans bg-slate-300
+                      border-transparent focus:border-white-500 focus:bg-white focus:ring
+                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  // onChange={onHandleInputChange}
+                  {...formUpdate.register("productImages")}
+                />
+                <p className={VALIDATIONRULE}>
+                  {formUpdate.formState.errors.productImages?.message}
+                </p>
+              </label>
+              <label className="inline w-1/2">
+                <span className="text-white block">Harga Produk</span>
+                <input
+                  type="number"
+                  name="productAmount"
+                  id="productAmount"
+                  className="mt-1 block form-input rounded-md text-sans bg-slate-300
+                  border-transparent focus:border-white-500 focus:bg-white focus:ring
+                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
+                  // onChange={onHandleInputChange}
+                  {...formUpdate.register("productAmount")}
+                />
+                <p className={VALIDATIONRULE}>
+                  {formUpdate.formState.errors.productAmount?.message}
+                </p>
+              </label>
+            </div>
+            <div className="flex w-full my-3">
+              <label className="inline w-1/2 me-3">
+                <span className="text-white block">Unit Produk</span>
                 <select
                   type="text"
                   name="unitOfMeasure"
                   id="unitOfMeasure"
                   className="mt-1 block form-input rounded-md text-sans bg-slate-300
                   border-transparent focus:border-white-500 focus:bg-white focus:ring w-full"
-                  onChange={onHandleInputChangeUpdate}
-                  {...formUpdate.register("unitOfMeasure", {
-                    required: "Mohon unit dapat di isi terlebih dahulu",
-                  })}
+                  // onChange={onHandleInputChange}
+                  {...formUpdate.register("unitOfMeasure")}
                 >
                   <option key="null object" value={""}>
                     Mohon memilih unit yang disediakan
@@ -802,23 +1005,46 @@ const Product = () => {
                 </p>
               </label>
               <label className="inline w-1/2">
-                <span className="text-black block">Harga Produk</span>
-                <input
-                  type="number"
-                  name="amount"
-                  id="amount"
+                <span className="text-white block">Brand Produk</span>
+                <select
+                  type="text"
+                  name="brandId"
+                  id="brandId"
                   className="mt-1 block form-input rounded-md text-sans bg-slate-300
-                  border-transparent focus:border-white-500 focus:bg-white focus:ring
-                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border w-full"
-                  onChange={onHandleInputChangeUpdate}
-                  {...formUpdate.register("amount", {
-                    required: "Mohon input harga produk",
-                  })}
-                />
+                  border-transparent focus:border-white-500 focus:bg-white focus:ring w-full"
+                  // onChange={onHandleInputChange}
+                  {...formUpdate.register("brandId")}
+                >
+                  <option key="null object" value={""}>
+                    Mohon memilih brand yang disediakan
+                  </option>
+                  {dataBrand.length > 0 &&
+                    dataBrand.map((brand, index) => (
+                      <option key={index} value={brand.brandId}>
+                        {brand.brandName}
+                      </option>
+                    ))}
+                </select>
                 <p className={VALIDATIONRULE}>
-                  {formUpdate.formState.errors.amount?.message}
+                  {formUpdate.formState.errors.brandId?.message}
                 </p>
               </label>
+            </div>
+            <div className="mt-5">
+              <span className="text-white inline-block col-span-2">
+                Deskripsi Product
+              </span>
+              <textarea
+                type="text"
+                name="productDescription"
+                id="productDescription"
+                className="my-1 form-input rounded-md text-sans bg-slate-300
+                               border-transparent focus:border-white-500 focus:bg-white focus:ring w-full h-24 col-span-2"
+                {...formUpdate.register("productDescription")}
+              />
+              <p className={VALIDATIONRULE}>
+                {formUpdate.formState.errors.productDescription?.message}
+              </p>
             </div>
           </DialogContentText>
         </DialogContent>
@@ -846,6 +1072,7 @@ const Product = () => {
         content={attrDialogValidation.content}
         handleButton={attrDialogValidation.handling}
       />
+      {isLoading && <LoadingScreen />}
     </div>
   );
 };

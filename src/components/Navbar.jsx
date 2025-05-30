@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MdHome } from "react-icons/md";
+import { MdFactory, MdHome } from "react-icons/md";
 import { MdOutlineStore } from "react-icons/md";
 import { MdOutlinePerson } from "react-icons/md";
 import { MdOutlineInsertChart } from "react-icons/md";
@@ -35,6 +35,14 @@ const Navbar = ({ navShow, onRenderData }) => {
           <h2 className={navShow ? "" : "hidden"}>Product</h2>
         </li>
         <li
+          className="flex mt-3 hover:cursor-pointer items-center"
+          key="brand"
+          onClick={() => sendData("brand")}
+        >
+          <MdFactory className="text-3xl mx-1" />
+          <h2 className={navShow ? "" : "hidden"}>Brand</h2>
+        </li>
+        <li
           className="flex mt-3 hover:cursor-pointer"
           key="customer"
           onClick={() => sendData("customer")}
@@ -50,14 +58,6 @@ const Navbar = ({ navShow, onRenderData }) => {
           <MdOutlineInsertChart className="text-3xl mx-1" />
           <h2 className={navShow ? "" : "hidden"}>Transaction</h2>
         </li>
-        {/* <li
-          className="flex mt-3 hover:cursor-pointer items-center"
-          key="report"
-          onClick={() => sendData("report")}
-        >
-          <MdSearch className="text-3xl mx-1" />
-          <h2 className={navShow ? "" : "hidden"}>Compare Market</h2>
-        </li> */}
       </ul>
     </nav>
   );

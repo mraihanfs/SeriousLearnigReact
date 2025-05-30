@@ -23,10 +23,15 @@ export const CUSTOMER_TYPES = [
   "Penginapan",
 ];
 
-export const VALIDATION_ERROR_LOGIN = {
-  title: "Login Failed",
-  description: "Login failed. Check your credentials and try again.",
-};
+export const FORM_VALIDATION = (transaction) => ({
+  title: `${transaction} Failed`,
+  description: `${transaction} failed. Check your credentials and try again.`,
+});
+
+export const VALIDATION_ERROR = (transaction) => ({
+  title: `${transaction} Failed"`,
+  description: `${transaction} failed. Please try again later.`,
+});
 
 export const VALIDATION_SUCCESS_LOGIN = {
   title: "Login Success",
@@ -41,4 +46,14 @@ export const VALIDATION_ERROR_ADD = {
 export const VALIDATION_ERROR_UPDATE = {
   title: "Mengubah data gagal",
   description: "Mohon isi kembali form yang masih kosong atau kurang sesuai",
+};
+
+export const VALIDATION_ERROR_LOGOUT = {
+  title: "Logout Failed",
+  description: "Logout failed. Please try again later",
+};
+
+export const VALIDATION_ERROR_REGIST = {
+  title: "Register Failed",
+  description: "Register failed. Please try again later",
 };

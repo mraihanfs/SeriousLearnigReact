@@ -13,7 +13,7 @@ export const CSSPROPERTYTAB = {
 
 export const CSSPROPERTYDIALOG = {
   "& .MuiPaper-root": {
-    backgroundColor: "darkgray !important",
+    backgroundColor: "#334155 !important",
     color: "white !important",
     width: "100% !important",
   },

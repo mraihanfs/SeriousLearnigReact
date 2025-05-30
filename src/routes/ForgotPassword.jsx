@@ -10,7 +10,6 @@ import authServices from "../services/authService";
 import LoadingScreen from "../components/LoadingScreen";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { loginSchema } from "../validationSchema/formValidation";
 
 const backgroundStyle = {
   backgroundImage: `url(${backgroundLogin})`,
@@ -19,9 +18,14 @@ const backgroundStyle = {
   height: "100vh", // Optional, for full viewport height
 };
 
+const schema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Please fill with email format")
+    .required("Please fill in the email"),
+});
 
-
-const Login = () => {
+const ForgotPassword = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [content, setContent] = useState({});
   const [handle, setHandle] = useState(null);
@@ -33,17 +37,17 @@ const Login = () => {
   } = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
-    resolver: yupResolver(loginSchema),
+    resolver: yupResolver(schema),
   });
 
   const navigate = useNavigate();
 
   const goToDashboard = () => navigate("/home");
 
-  const login = async (data) => {
+  const forgetPassword = async (data) => {
     try {
       setIsLoading(true);
-      const resp = await authServices.login(data);
+      const resp = await authServices.forgetPassword(data);
       console.log("Login Successfull", resp);
       setIsLoading(false);
       setOpenDialog(true);
@@ -59,7 +63,7 @@ const Login = () => {
       setContent(
         err.response.data.status
           ? err.response?.data?.status.contents["en"]
-          : VALIDATION_ERROR("Login")
+          : VALIDATION_ERROR("Forgot Password")
       );
       setHandle(() => closeDialog);
     }
@@ -68,7 +72,7 @@ const Login = () => {
   const onError = (errors) => {
     console.log("Validation Errors:", errors);
     setOpenDialog(true);
-    setContent(FORM_VALIDATION("Login"));
+    setContent(FORM_VALIDATION("Forgot Password"));
     setHandle(() => closeDialog);
   };
 
@@ -88,13 +92,6 @@ const Login = () => {
     setHandle(null);
     goToDashboard();
   };
-  // console.log(isHaveKeyObject(errors));
-  // if (isHaveKeyObject(errors)) {
-  //   setOpenDialog(!openDialog)
-  // }
-  // useEffect(() => {
-  //   console.log("✅ Dialog state updated:", openDialog);
-  // }, [openDialog]); // Runs when `openDialog` changes
 
   return (
     <div
@@ -102,80 +99,45 @@ const Login = () => {
       className="h-screen w-screen flex flex-col items-center justify-center box-border"
     >
       {isLoading && <LoadingScreen />}
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center w-fit">
         <div className="bg-white container rounded-xl">
           <div className="mb-2 mt-10 text-center text-xl font-semibold">
-            Login to Account
+            Forget Password
           </div>
-          <p className="text-center text-xs">
-            Please enter your email and password to continue
+          <p className="text-center text-xs px-7">
+            Please enter your email form forget password and check your email
           </p>
           <form
             className="grid grid-rows-auto"
-            onSubmit={handleSubmit(login, onError)}
+            onSubmit={handleSubmit(forgetPassword, onError)}
           >
-            <div className="m-3">
-              <label
-                htmlFor="username"
-                className="block m-1 text-slate-600 text-sm"
-              >
+            <div className="justify-self-center mt-3">
+              <label htmlFor="email" className="block m-1 text-sm">
                 Email address:
               </label>
               <input
                 type="text"
-                id={USERNAME}
+                id="email"
                 placeholder="esteban_schiller@gmail.com"
-                className="form-input rounded-xl w-80 bg-slate-200"
-                {...register(USERNAME)}
+                className="form-input rounded-md w-[22rem] bg-slate-200 mt-1"
+                {...register("email")}
               />
-              <p className={VALIDATIONRULE}>{errors[USERNAME]?.message}</p>
+              <p className={VALIDATIONRULE}>{errors.email?.message}</p>
             </div>
-            <div className="m-3 mb-1">
-              <div className="text-slate-600 flex justify-between m-1 text-sm">
-                <label htmlFor="password" className="">
-                  Password
-                </label>
-                <a
-                  href="/forgot-password"
-                  className="text-gray-500 hover:text-gray-700 hover:underline"
-                >
-                  Forget Password?
-                </a>
-              </div>
-              <input
-                type="password"
-                name=""
-                id={PASSWORD}
-                placeholder="⬤ ⬤ ⬤ ⬤ ⬤ ⬤"
-                className="form-input rounded-xl w-80 bg-slate-200"
-                {...register(PASSWORD)}
-              />
-              <p className={VALIDATIONRULE}>{errors[PASSWORD]?.message}</p>
-            </div>
-            <div className="ms-3                                                 ">
-              <input
-                type="checkbox"
-                className="form-checkbox border border-solid p-1 m-1 text-black rounded-md"
-                id="remeber"
-              />
-              <label htmlFor="remeber" className="ms-1 text-sm">
-                Remember Password
-              </label>
-            </div>
-            <div className="mt-10 justify-self-center">
+            <div className="mt-5 justify-self-center">
               <input
                 type="submit"
-                className="border border-solid p-1 rounded-md bg-blue-500 text-white w-72 h-10 hover:cursor-pointer hover:bg-blue-400 font-semibold text-sm"
-                value="Sign in"
+                className="border border-solid p-1 rounded-md bg-blue-500 text-white w-64 h-10 hover:cursor-pointer hover:bg-blue-400 font-semibold text-sm"
+                value="Send"
               />
             </div>
             <article className="mx-3 mt-1 mb-10 justify-self-center text-xs">
-              Don't have an account?
+              Remember your password?
               <a
-                href="/register"
+                href="/"
                 className="text-sans ms-1 text-blue-600 hover:underline"
               >
-                Create Account
+                Login
               </a>
             </article>
           </form>
@@ -191,4 +153,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ForgotPassword;

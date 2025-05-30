@@ -5,12 +5,11 @@ import { useForm } from "react-hook-form";
 import { PASSWORD, USERNAME } from "../constants/DataConstant";
 import { VALIDATIONRULE } from "../constants/PropertyCss";
 import DialogValidation from "../components/DialogValidation";
-import { VALIDATION_ERROR, FORM_VALIDATION } from "../constants/DataInput";
+import { FORM_VALIDATION, VALIDATION_ERROR } from "../constants/DataInput";
 import authServices from "../services/authService";
 import LoadingScreen from "../components/LoadingScreen";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { loginSchema } from "../validationSchema/formValidation";
+import { registerSchema } from "../validationSchema/formValidation";
 
 const backgroundStyle = {
   backgroundImage: `url(${backgroundLogin})`,
@@ -19,9 +18,7 @@ const backgroundStyle = {
   height: "100vh", // Optional, for full viewport height
 };
 
-
-
-const Login = () => {
+const Register = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [content, setContent] = useState({});
   const [handle, setHandle] = useState(null);
@@ -33,25 +30,25 @@ const Login = () => {
   } = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
-    resolver: yupResolver(loginSchema),
+    resolver: yupResolver(registerSchema),
   });
 
   const navigate = useNavigate();
 
-  const goToDashboard = () => navigate("/home");
+  const goToLogin = () => navigate("/");
 
-  const login = async (data) => {
+  const regist = async (data) => {
     try {
       setIsLoading(true);
-      const resp = await authServices.login(data);
-      console.log("Login Successfull", resp);
+      const resp = await authServices.register(data);
+      console.log("Register Successfull", resp);
       setIsLoading(false);
       setOpenDialog(true);
       setContent(resp.data.status.contents["en"]);
-      setHandle(() => handleLoginSuccess);
+      setHandle(() => handleRegistSuccess);
     } catch (err) {
       console.error(
-        "Login Failed",
+        "Register Failed",
         err.response?.data?.responseKey || err.message
       );
       setIsLoading(false);
@@ -59,7 +56,7 @@ const Login = () => {
       setContent(
         err.response.data.status
           ? err.response?.data?.status.contents["en"]
-          : VALIDATION_ERROR("Login")
+          : VALIDATION_ERROR("Register")
       );
       setHandle(() => closeDialog);
     }
@@ -68,7 +65,7 @@ const Login = () => {
   const onError = (errors) => {
     console.log("Validation Errors:", errors);
     setOpenDialog(true);
-    setContent(FORM_VALIDATION("Login"));
+    setContent(FORM_VALIDATION("Register"));
     setHandle(() => closeDialog);
   };
 
@@ -78,23 +75,16 @@ const Login = () => {
     setHandle(null);
   };
 
-  const closeDialogOnSuccessLogin = () => {
+  const closeDialogOnSuccessRegist = () => {
     setOpenDialog(false);
     setContent({});
   };
 
-  const handleLoginSuccess = () => {
-    closeDialogOnSuccessLogin();
+  const handleRegistSuccess = () => {
+    closeDialogOnSuccessRegist();
     setHandle(null);
-    goToDashboard();
+    goToLogin();
   };
-  // console.log(isHaveKeyObject(errors));
-  // if (isHaveKeyObject(errors)) {
-  //   setOpenDialog(!openDialog)
-  // }
-  // useEffect(() => {
-  //   console.log("✅ Dialog state updated:", openDialog);
-  // }, [openDialog]); // Runs when `openDialog` changes
 
   return (
     <div
@@ -104,80 +94,97 @@ const Login = () => {
       {isLoading && <LoadingScreen />}
       <div className="flex justify-center items-center">
         <div className="bg-white container rounded-xl">
-          <div className="mb-2 mt-10 text-center text-xl font-semibold">
-            Login to Account
-          </div>
-          <p className="text-center text-xs">
-            Please enter your email and password to continue
+          <div className="mt-3 text-center text-xl">Create an Account</div>
+          <p className="m-2 text-center text-l font-sans">
+            Create a account to continue
           </p>
           <form
             className="grid grid-rows-auto"
-            onSubmit={handleSubmit(login, onError)}
+            onSubmit={handleSubmit(regist, onError)}
           >
             <div className="m-3">
-              <label
-                htmlFor="username"
-                className="block m-1 text-slate-600 text-sm"
-              >
+              <label htmlFor="email" className="block m-1 text-slate-600">
                 Email address:
               </label>
               <input
-                type="text"
-                id={USERNAME}
+                type="email"
+                id="email"
+                className="form-input rounded-xl w-80"
+                {...register("username")}
                 placeholder="esteban_schiller@gmail.com"
-                className="form-input rounded-xl w-80 bg-slate-200"
-                {...register(USERNAME)}
               />
-              <p className={VALIDATIONRULE}>{errors[USERNAME]?.message}</p>
+              <p className={VALIDATIONRULE}>{errors.username?.message}</p>
             </div>
-            <div className="m-3 mb-1">
-              <div className="text-slate-600 flex justify-between m-1 text-sm">
-                <label htmlFor="password" className="">
-                  Password
-                </label>
-                <a
-                  href="/forgot-password"
-                  className="text-gray-500 hover:text-gray-700 hover:underline"
-                >
-                  Forget Password?
-                </a>
-              </div>
+            <div className="m-3">
+              <label htmlFor="name" className="block m-1 text-slate-600">
+                Name:
+              </label>
+              <input
+                type="text"
+                id="name"
+                className="form-input rounded-xl w-80"
+                {...register("full_name")}
+                placeholder="Fullname"
+              />
+              <p className={VALIDATIONRULE}>{errors.name?.message}</p>
+            </div>
+
+            <div className="m-3">
+              <label htmlFor="password" className="block m-1 text-slate-600">
+                Password
+              </label>
               <input
                 type="password"
                 name=""
-                id={PASSWORD}
+                id="password"
+                className="form-input rounded-xl w-80 "
+                {...register("password")}
                 placeholder="⬤ ⬤ ⬤ ⬤ ⬤ ⬤"
-                className="form-input rounded-xl w-80 bg-slate-200"
-                {...register(PASSWORD)}
               />
               <p className={VALIDATIONRULE}>{errors[PASSWORD]?.message}</p>
             </div>
-            <div className="ms-3                                                 ">
-              <input
-                type="checkbox"
-                className="form-checkbox border border-solid p-1 m-1 text-black rounded-md"
-                id="remeber"
-              />
-              <label htmlFor="remeber" className="ms-1 text-sm">
-                Remember Password
+            <div className="m-3">
+              <label
+                htmlFor="confirmPassword"
+                className="block m-1 text-slate-600"
+              >
+                Confirm Password
               </label>
+              <input
+                type="password"
+                name=""
+                id="confirmPassword"
+                className="form-input rounded-xl w-80 "
+                {...register("confirmPassword")}
+                placeholder="⬤ ⬤ ⬤ ⬤ ⬤ ⬤"
+              />
+              <p className={VALIDATIONRULE}>
+                {errors.confirmPassword?.message}
+              </p>
             </div>
-            <div className="mt-10 justify-self-center">
+            <div className="m-3">
+              <input type="checkbox" name="tnc" id="tnc" {...register("tnc")} />
+              <label htmlFor="tnc" className="inline ms-1 text-slate-600">
+                I accept terms and conditions
+              </label>
+              <p className={VALIDATIONRULE}>{errors.tnc?.message}</p>
+            </div>
+            <div className="m-5 justify-self-center">
               <input
                 type="submit"
                 className="border border-solid p-1 rounded-md bg-blue-500 text-white w-72 h-10 hover:cursor-pointer hover:bg-blue-400 font-semibold text-sm"
-                value="Sign in"
+                value="Sign Up"
               />
+              <p className="text-xs mt-2 mb-5 text-center">
+                Already have an account?
+                <a
+                  href="/"
+                  className="text-sans ms-1 text-blue-600 hover:underline"
+                >
+                  Login
+                </a>
+              </p>
             </div>
-            <article className="mx-3 mt-1 mb-10 justify-self-center text-xs">
-              Don't have an account?
-              <a
-                href="/register"
-                className="text-sans ms-1 text-blue-600 hover:underline"
-              >
-                Create Account
-              </a>
-            </article>
           </form>
         </div>
       </div>
@@ -191,4 +198,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

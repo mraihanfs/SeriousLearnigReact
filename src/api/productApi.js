@@ -1,12 +1,10 @@
 import connInstance from "./axiosconfig";
 
-const transactionApi = {
-  inquiry: () =>
-    connInstance.get("/product/v1/getAll", {
-      headers: {
-        "ngrok-skip-browser-warning": true,
-      },
-    }),
+const productApi = {
+  inquiry: () => connInstance.get("/product/v1/getAll"),
+  create: (reqData) =>
+    connInstance.post("/product/v1/create", reqData),
+  update: (reqData) => connInstance.post("/product/v1/update", reqData)
 };
 
-export default transactionApi;
+export default productApi;

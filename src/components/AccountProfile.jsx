@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 import DialogValidation from "../components/DialogValidation";
 import authServices from "../services/authService";
 import LoadingScreen from "../components/LoadingScreen";
-
+import {
+  VALIDATION_ERROR,
+  VALIDATION_ERROR_LOGOUT,
+} from "../constants/DataInput";
 
 const AccountProfile = () => {
   const [isDropdownShow, setIsDropdownShow] = useState(false);
@@ -30,19 +33,26 @@ const AccountProfile = () => {
 
   const logout = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const resp = await authServices.logout();
       console.log("Logout Successfull", resp);
-      setIsLoading(false)
+      setIsLoading(false);
       setOpenDialog(true);
-      setContent(resp.data.content["ID"]);
+      setContent(resp.data.status.contents["en"]);
       setHandle(() => handleLogoutSuccess);
     } catch (err) {
       console.error(
         "Logout Failed",
-        err.response?.data?.responseKey || err.message
+        err.response?.data?.status.contents["en"] || err.message
       );
       setIsLoading(false);
+      setOpenDialog(true);
+      setContent(
+        err.response.data.status
+          ? err.response?.data?.status.contents["en"]
+          : VALIDATION_ERROR_LOGOUT
+      );
+      setHandle(() => closeDialogOnSuccessLogout);
     }
   };
 

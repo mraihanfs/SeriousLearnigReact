@@ -292,13 +292,15 @@ const Transaction = () => {
   };
 
   const onHandlingSubmitAddTransaction = (data) => {
-    // if (data["productName-0"] === undefined) {
-    //   onErrorSubmitAddTransction("There is not have list product");
-    //   return;
-    // }
-    console.log(JSON.parse(getValues("productToBuy.0.product")).unit);
+    // console.log(JSON.parse(getValues("productToBuy.0.product")).unit);
+    console.log(data);
     const parseCustomer = JSON.parse(data.customer);
     console.table(parseCustomer);
+    const products = data.productToBuy;
+    console.log(products);
+    products.forEach((product) => {
+      console.log(product);
+    });
     // const oldData = [...dataTransaction];
     // const transactionId =
     //   dataTransaction[dataTransaction.length - 1].transactionID + 1;
@@ -887,10 +889,10 @@ const Transaction = () => {
                 {fields?.length > 0 ? (
                   <>
                     {fields.map((barang, indexList) => {
-                      console.log(
-                        dataProductToBuy?.[indexList]?.product,
-                        `On index list ${indexList}`
-                      );
+                      // console.log(
+                      //   dataProductToBuy?.[indexList]?.product,
+                      //   `On index list ${indexList}`
+                      // );
                       const selectedProduct = dataProductToBuy?.[indexList]
                         ?.product
                         ? JSON.parse(dataProductToBuy?.[indexList]?.product)
@@ -912,6 +914,39 @@ const Transaction = () => {
                                 {
                                   required:
                                     "Mohon pilih produk terlebih dahulu",
+                                  onChange: () => {
+                                    setValue(
+                                      `productToBuy.${indexList}.id`,
+                                      selectedProduct?.id
+                                    ),
+                                      setValue(
+                                        `productToBuy.${indexList}.productName`,
+                                        selectedProduct?.productName
+                                      );
+                                    setValue(
+                                      `productToBuy.${indexList}.unit`,
+                                      selectedProduct?.unit
+                                    );
+                                    setValue(
+                                      `productToBuy.${indexList}.harga`,
+                                      selectedProduct?.harga
+                                    );
+                                    if (dataProductToBuy[indexList].qty && selectedProduct) {
+                                      const harga = selectedProduct?.harga;
+                                      let total =
+                                        harga *
+                                        dataProductToBuy[indexList]?.qty;
+                                      setValue(
+                                        `productToBuy.${indexList}.total`,
+                                        total
+                                      );
+                                      const calculate = calculateTotal(
+                                        dataProductToBuy,
+                                        "total"
+                                      );
+                                      setSum(calculate);
+                                    }
+                                  },
                                 }
                               )}
                             >
@@ -1007,7 +1042,7 @@ const Transaction = () => {
                         Total Transaksi
                       </td>
                       <td className="text-center font-bold">
-                        {typeof sum == "number" && changeCurrenc(sum)}
+                        {typeof sum == "number" && changeCurrencyForm(sum)}
                       </td>
                     </tr>
                   </>
